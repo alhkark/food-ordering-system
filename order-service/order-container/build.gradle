@@ -1,0 +1,13 @@
+plugins {
+    id 'common-library-convention'
+    id 'logging-library-convention'
+    id 'spring-library-convention'
+}
+
+dependencies {
+    implementation project(':order-service:order-domain:order-domain-core')
+    implementation project(':order-service:order-domain:order-application-service')
+    implementation project(':order-service:order-data-access')
+    implementation project(':order-service:order-messaging')
+    implementation project(':order-service:order-application')
+}

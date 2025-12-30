@@ -1,0 +1,37 @@
+plugins {
+    id 'java'
+    id 'com.diffplug.spotless'
+}
+
+group = 'com.food.ordering.system'
+version = '1.0-SNAPSHOT'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
+}
+
+repositories {
+    mavenCentral()
+}
+
+def libs = project.extensions.getByType(VersionCatalogsExtension).named("libs")
+
+dependencies {
+    testImplementation platform(libs.findLibrary("junit.bom").get().get())
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+spotless {
+    java {
+        googleJavaFormat(libs.findVersion("google.java.format").get().getDisplayName())
+        removeUnusedImports()
+        importOrder()
+        target("src/**/*.java")
+    }
+}
