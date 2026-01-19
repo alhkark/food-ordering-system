@@ -15,7 +15,8 @@ public class OrderCreateCommandHandler {
 
   private final OrderMapper orderMapper;
 
-  private final OrderCreatedPaymentRequestMessagePublisher orderCreatedPaymentRequestMessagePublisher;
+  private final OrderCreatedPaymentRequestMessagePublisher
+      orderCreatedPaymentRequestMessagePublisher;
 
   public OrderCreateCommandHandler(
       OrderCreateHelper orderCreateHelper,
