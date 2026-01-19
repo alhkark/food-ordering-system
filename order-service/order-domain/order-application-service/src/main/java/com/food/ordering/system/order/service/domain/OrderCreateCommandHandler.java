@@ -1,6 +1,5 @@
-package com.food.ordering.system.order.service.domain.ports;
+package com.food.ordering.system.order.service.domain;
 
-import com.food.ordering.system.order.service.domain.OrderDomainService;
 import com.food.ordering.system.order.service.domain.dto.create.CreateOrderCommand;
 import com.food.ordering.system.order.service.domain.dto.create.CreateOrderResponse;
 import com.food.ordering.system.order.service.domain.entity.Order;
@@ -32,19 +31,23 @@ public class OrderCreateCommandHandler {
 
   private final OrderMapper orderMapper;
 
+  private final ApplicationDomainEventPublisher applicationDomainEventPublisher;
+
   public OrderCreateCommandHandler(
       OrderDomainService orderDomainService,
       OrderRepository orderRepository,
       CustomerRepository customerRepository,
       RestaurantRepository restaurantRepository,
       CreateOrderCommandMapper createOrderCommandMapper,
-      OrderMapper orderMapper) {
+      OrderMapper orderMapper,
+      ApplicationDomainEventPublisher applicationDomainEventPublisher) {
     this.orderDomainService = orderDomainService;
     this.orderRepository = orderRepository;
     this.customerRepository = customerRepository;
     this.restaurantRepository = restaurantRepository;
     this.createOrderCommandMapper = createOrderCommandMapper;
     this.orderMapper = orderMapper;
+    this.applicationDomainEventPublisher = applicationDomainEventPublisher;
   }
 
   @Transactional
@@ -55,6 +58,7 @@ public class OrderCreateCommandHandler {
     var orderCreatedEvent = orderDomainService.validateAndInitiateOrder(order, restaurant);
     var orderResult = saveOrder(order);
     log.info("Order is created with id: {}", orderResult.getId().value());
+    applicationDomainEventPublisher.publish(orderCreatedEvent);
     return orderMapper.toCreateOrderResponse(orderResult);
   }
 
