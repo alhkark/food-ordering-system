@@ -9,14 +9,11 @@ import org.springframework.validation.annotation.Validated;
 @Slf4j
 @Validated
 @Service
-public class RestaurantApprovalResponseMessageListenerImpl implements PaymentResponseMessageListener {
-    @Override
-    public void paymentCompleted(PaymentResponse paymentResponse) {
+public class RestaurantApprovalResponseMessageListenerImpl
+    implements PaymentResponseMessageListener {
+  @Override
+  public void paymentCompleted(PaymentResponse paymentResponse) {}
 
-    }
-
-    @Override
-    public void paymentCancelled(PaymentResponse paymentResponse) {
-
-    }
+  @Override
+  public void paymentCancelled(PaymentResponse paymentResponse) {}
 }

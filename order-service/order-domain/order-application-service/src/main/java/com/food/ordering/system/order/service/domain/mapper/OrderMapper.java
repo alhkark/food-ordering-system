@@ -11,10 +11,10 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface OrderMapper {
 
-  @Mapping(source = "trackingId", target = "orderTrackingId")
-  @Mapping(target = "message", expression = "java(\"Order created successfully.\")")
-  CreateOrderResponse toCreateOrderResponse(Order order);
+  @Mapping(source = "order.trackingId", target = "orderTrackingId")
+  CreateOrderResponse toCreateOrderResponse(Order order, String message);
 
+  @Mapping(source = "trackingId", target = "orderTrackingId")
   TrackOrderResponse toTrackOrderResponse(Order order);
 
   default UUID toOrderTrackingId(TrackingId trackingId) {
