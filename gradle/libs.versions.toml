@@ -1,12 +1,15 @@
 [versions]
 lombok = "1.18.38"
 spring-boot = "4.0.1"
+confluent = "8.0.3"
 spring-dependency-management = "1.1.7"
 junit = "6.0.2"
 spotless = "8.1.0"
 google-java-format="1.33.0"
 mapstruct="1.6.3"
 mockito="5.21.0"
+apache-avro="1.12.1"
+apache-avro-gradle-plugin="1.2.0"
 
 [libraries]
 #plugins
@@ -21,7 +24,10 @@ junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "mapstruct" }
 mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "mapstruct" }
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
+kafka-avro-ser = { module = "io.confluent:kafka-avro-serializer", version.ref = "confluent" }
+apache-avro = { module = "org.apache.avro:avro", version.ref = "apache-avro" }
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
 spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management" }
+apache-avro-gradle-plugin = { id = "io.github.martinsjavacode.avro-gradle-plugin", version.ref = "apache-avro-gradle-plugin" }

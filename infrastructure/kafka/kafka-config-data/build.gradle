@@ -1,0 +1,13 @@
+plugins {
+    id 'common-library-convention'
+    id 'spring-library-convention'
+}
+
+tasks.bootJar {
+    enabled = false
+}
+
+dependencies {
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+}

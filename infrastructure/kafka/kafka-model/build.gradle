@@ -1,0 +1,13 @@
+plugins {
+    id 'common-library-convention'
+    id 'apache-avro-library-convention'
+    alias libs.plugins.apache.avro.gradle.plugin
+}
+
+avro {
+    sourceDir = "src/main/resources/avro"
+    outputDir = "generated-sources/avro"
+    fieldVisibility = "PRIVATE"
+    stringType = "String"
+    optionalGetters = true
+}

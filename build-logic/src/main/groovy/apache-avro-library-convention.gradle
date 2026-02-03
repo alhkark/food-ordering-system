@@ -1,0 +1,11 @@
+def libs = project.extensions.getByType(VersionCatalogsExtension).named("libs")
+
+dependencies {
+    libs.findLibrary("kafka-avro-ser").get().get()
+    implementation ("org.apache.avro:avro:${libs.findVersion("apache.avro").get().getDisplayName()}") {
+        exclude group: 'org.slf4j', module: 'slf4j-api'
+        exclude group: 'log4j', module: 'log4j'
+        exclude group: 'io.swagger', module: 'swagger-annotations'
+        exclude group: 'io.swagger', module: 'swagger-core'
+    }
+}

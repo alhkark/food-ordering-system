@@ -1,0 +1,20 @@
+plugins {
+    id 'common-library-convention'
+    id 'spring-library-convention'
+    id 'apache-avro-library-convention'
+}
+
+tasks.bootJar {
+    enabled = false
+}
+
+dependencies {
+    implementation project(':infrastructure:kafka:kafka-model')
+    implementation project(':infrastructure:kafka:kafka-config-data')
+    implementation project(':order-service:order-domain:order-domain-core')
+    implementation project(':common:common-domain')
+
+    implementation 'org.springframework.kafka:spring-kafka'
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+}
