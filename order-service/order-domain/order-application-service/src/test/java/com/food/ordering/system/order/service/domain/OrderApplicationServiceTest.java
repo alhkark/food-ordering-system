@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,8 @@ public class OrderApplicationServiceTest extends BaseTest {
   CreateOrderCommand createOrderCommand;
   CreateOrderCommand createOrderCommandWrongPrice;
   CreateOrderCommand createOrderCommandWrongProductPrice;
+  Customer customer;
+  Restaurant restaurantResponse;
   final UUID CUSTOMER_ID = UUID.fromString("b134c0f3-2c55-4e21-9834-af684f87d4de");
   final UUID RESTAURANT_ID = UUID.fromString("6e446872-bbeb-43f4-8915-6f5ac60f80c0");
   final UUID PRODUCT_ID = UUID.fromString("c3304d12-2f65-4948-baed-1c871bb7025e");
@@ -45,7 +48,7 @@ public class OrderApplicationServiceTest extends BaseTest {
   final BigDecimal PRICE = new BigDecimal("200.00");
 
   @BeforeAll
-  public void setup() {
+  public void init() {
     var orderAddress = new OrderAddress("street 1", "12345", "London");
     var orderItem_1 =
         new OrderItem(PRODUCT_ID, 1, new BigDecimal("50.00"), new BigDecimal("50.00"));
@@ -99,10 +102,10 @@ public class OrderApplicationServiceTest extends BaseTest {
             .address(orderAddress)
             .build();
 
-    var customer = new Customer();
+    customer = new Customer();
     customer.setId(new CustomerId(CUSTOMER_ID));
 
-    var restaurantResponse =
+    restaurantResponse =
         Restaurant.builder()
             .id(new RestaurantId(createOrderCommand.restaurantId()))
             .products(
@@ -118,7 +121,10 @@ public class OrderApplicationServiceTest extends BaseTest {
 
     var order = createOrderCommandMapper.toOrder(createOrderCommand);
     order.setId(new OrderId(ORDER_ID));
+  }
 
+  @BeforeEach
+  public void setup() {
     when(customerRepository.findCustomer(CUSTOMER_ID)).thenReturn(Optional.of(customer));
     when(restaurantRepository.findRestaurantInformation(
             createOrderCommandMapper.toRestaurant(createOrderCommand)))

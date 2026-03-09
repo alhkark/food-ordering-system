@@ -11,3 +11,11 @@ avro {
     stringType = "String"
     optionalGetters = true
 }
+
+sourceSets {
+    main {
+        java {
+            srcDirs += ['build/generated-sources/avro']
+        }
+    }
+}
