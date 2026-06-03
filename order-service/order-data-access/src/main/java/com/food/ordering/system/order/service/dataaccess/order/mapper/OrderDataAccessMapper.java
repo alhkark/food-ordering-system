@@ -19,7 +19,7 @@ import org.mapstruct.*;
     uses = {UtilsMapper.class})
 public abstract class OrderDataAccessMapper {
 
-  private static final String FAILURE_MESSAGE_DELIMiTER = ",";
+  private static final String FAILURE_MESSAGE_DELIMITER = ",";
 
   @Mapping(target = "id", expression = "java(order.getId().value())")
   @Mapping(target = "customerId", expression = "java(order.getCustomerId().value())")
@@ -46,13 +46,13 @@ public abstract class OrderDataAccessMapper {
   public abstract OrderItem toOrderItem(OrderItemEntity orderItemEntity);
 
   protected String toFailureMessagesDao(List<String> failureMessages) {
-    return failureMessages == null ? "" : String.join(FAILURE_MESSAGE_DELIMiTER, failureMessages);
+    return failureMessages == null ? "" : String.join(FAILURE_MESSAGE_DELIMITER, failureMessages);
   }
 
   protected List<String> toFailureMessages(String failureMessages) {
     return failureMessages == null
         ? new ArrayList<>()
-        : Arrays.stream(failureMessages.split(FAILURE_MESSAGE_DELIMiTER))
+        : Arrays.stream(failureMessages.split(FAILURE_MESSAGE_DELIMITER))
             .map(String::trim)
             .collect(Collectors.toCollection(ArrayList::new));
   }

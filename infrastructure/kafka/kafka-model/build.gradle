@@ -10,6 +10,7 @@ avro {
     fieldVisibility = "PRIVATE"
     stringType = "String"
     optionalGetters = true
+    useDecimalLogical = true
 }
 
 sourceSets {

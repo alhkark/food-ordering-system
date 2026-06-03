@@ -1,6 +1,8 @@
 plugins {
     id 'common-library-convention'
     id 'spring-library-convention'
+    id 'apache-avro-library-convention'
+    id 'logging-library-convention'
 }
 
 tasks.bootJar {
@@ -12,6 +14,9 @@ dependencies {
     implementation project(':infrastructure:kafka:kafka-consumer')
     implementation project(':infrastructure:kafka:kafka-model')
     implementation project(':infrastructure:kafka:kafka-producer')
-    implementation project(':order-service:order-domain:order-domain-core')
-    implementation project(':common:common-domain')
+    implementation project(':order-service:order-domain:order-application-service')
+    implementation 'org.springframework.kafka:spring-kafka'
+
+    implementation libs.mapstruct
+    annotationProcessor libs.mapstruct.processor
 }

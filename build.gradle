@@ -1,6 +1,6 @@
-plugins {
-    id "io.github.adityabhaskar.dependencygraph" version "0.1.6"
-}
+ plugins {
+     id "io.github.adityabhaskar.dependencygraph" version "0.1.6"
+ }
 
 group = 'com.food.ordering.system'
 version = '1.0-SNAPSHOT'

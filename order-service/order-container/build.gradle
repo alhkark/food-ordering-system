@@ -10,4 +10,11 @@ dependencies {
     implementation project(':order-service:order-data-access')
     implementation project(':order-service:order-messaging')
     implementation project(':order-service:order-application')
+
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+}
+
+bootBuildImage {
+    imageName = "${project.group}/order.service:${project.version}"
+//    environment = ["BP_JVM_VERSION": "21", "BP_JVM_HEAD_ROOM": "0"]
 }

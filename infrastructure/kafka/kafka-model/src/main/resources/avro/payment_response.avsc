@@ -12,10 +12,10 @@
         },
         {
             "name": "sagaId",
-            "type": {
+            "type": ["null",{
                 "type": "string",
                 "logicalType": "uuid"
-            }
+            }]
         },
         {
             "name": "paymentId",
