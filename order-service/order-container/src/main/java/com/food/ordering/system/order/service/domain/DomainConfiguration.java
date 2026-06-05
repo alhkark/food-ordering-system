@@ -8,8 +8,9 @@ import org.springframework.context.annotation.FilterType;
 @Configuration
 @ComponentScan(
     basePackages = {"com.food.ordering.system"},
-        includeFilters = {@ComponentScan.Filter(type = FilterType.ANNOTATION, classes = {DomainService.class})}
-)
-public class DomainConfiguration {
-
-}
+    includeFilters = {
+      @ComponentScan.Filter(
+          type = FilterType.ANNOTATION,
+          classes = {DomainService.class})
+    })
+public class DomainConfiguration {}

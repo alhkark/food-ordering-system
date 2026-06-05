@@ -7,14 +7,17 @@ import com.food.ordering.system.order.service.domain.entity.Restaurant;
 import com.food.ordering.system.order.service.domain.exception.OrderDomainException;
 import com.food.ordering.system.order.service.domain.mapper.CreateOrderCommandMapper;
 import com.food.ordering.system.order.service.domain.mapper.OrderMapper;
+import com.food.ordering.system.order.service.domain.ports.output.message.publisher.payment.OrderCreatedPaymentRequestMessagePublisher;
 import com.food.ordering.system.order.service.domain.ports.output.repository.CustomerRepository;
 import com.food.ordering.system.order.service.domain.ports.output.repository.OrderRepository;
 import com.food.ordering.system.order.service.domain.ports.output.repository.RestaurantRepository;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+@RequiredArgsConstructor
 @Slf4j
 @Component
 public class OrderCreateCommandHandler {
@@ -31,27 +34,18 @@ public class OrderCreateCommandHandler {
 
   private final OrderMapper orderMapper;
 
-  public OrderCreateCommandHandler(
-      OrderDomainService orderDomainService,
-      OrderRepository orderRepository,
-      CustomerRepository customerRepository,
-      RestaurantRepository restaurantRepository,
-      CreateOrderCommandMapper createOrderCommandMapper,
-      OrderMapper orderMapper) {
-    this.orderDomainService = orderDomainService;
-    this.orderRepository = orderRepository;
-    this.customerRepository = customerRepository;
-    this.restaurantRepository = restaurantRepository;
-    this.createOrderCommandMapper = createOrderCommandMapper;
-    this.orderMapper = orderMapper;
-  }
+  private final OrderCreatedPaymentRequestMessagePublisher
+      orderCreatedPaymentRequestMessagePublisher;
 
   @Transactional
   public CreateOrderResponse createOrder(CreateOrderCommand createOrderCommand) {
     checkCustomer(createOrderCommand.customerId());
     var restaurant = checkRestaurant(createOrderCommand);
     var order = createOrderCommandMapper.toOrder(createOrderCommand);
-    var orderCreatedEvent = orderDomainService.validateAndInitiateOrder(order, restaurant);
+    var orderCreatedEvent =
+        orderDomainService.validateAndInitiateOrder(
+            order, restaurant, orderCreatedPaymentRequestMessagePublisher);
+    orderCreatedPaymentRequestMessagePublisher.publish(orderCreatedEvent);
     var orderResult = saveOrder(order);
     log.info("Order is created with id: {}", orderResult.getId().value());
     return orderMapper.toCreateOrderResponse(orderResult, "Order created successfully");

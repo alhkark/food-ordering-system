@@ -1,5 +1,15 @@
 rootProject.name = 'food-ordering-system'
 
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        mavenCentral()
+        maven {
+            url "https://packages.confluent.io/maven/"
+        }
+    }
+}
+
 includeBuild('build-logic')
 
 include 'order-service'
@@ -19,3 +29,20 @@ include 'infrastructure:kafka:kafka-consumer'
 include 'infrastructure:kafka:kafka-model'
 include 'infrastructure:kafka:kafka-config-data'
 include 'common:common-application'
+include 'customer-service'
+include 'restaurant-service'
+include 'payment-service'
+include 'payment-service:payment-container'
+include 'payment-service:payment-data-access'
+include 'payment-service:payment-messaging'
+include 'payment-service:payment-domain'
+include 'payment-service:payment-domain:payment-domain-core'
+include 'payment-service:payment-domain:payment-application-service'
+include 'restaurant-service:restaurant-container'
+include 'restaurant-service:restaurant-data-access'
+include 'restaurant-service:restaurant-domain'
+include 'restaurant-service:restaurant-domain:restaurant-application-service'
+include 'restaurant-service:restaurant-domain:restaurant-domain-core'
+include 'restaurant-service:restaurant-messaging'
+include 'common:common-data-access'
+include 'common:common-mapper'

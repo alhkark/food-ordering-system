@@ -5,11 +5,19 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.persistence.autoconfigure.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-@EnableJpaRepositories("com.food.ordering.system.order.service.dataaccess")
-@EntityScan("com.food.ordering.system.order.service.dataaccess")
+@EnableJpaRepositories(
+    basePackages = {
+      "com.food.ordering.system.order.service.dataaccess",
+      "com.food.ordering.system.dataaccess"
+    })
+@EntityScan(
+    basePackages = {
+      "com.food.ordering.system.order.service.dataaccess",
+      "com.food.ordering.system.dataaccess"
+    })
 @SpringBootApplication(scanBasePackages = "com.food.ordering.system")
 public class OrderServiceApplication {
-    static void main(String[] args) {
-        SpringApplication.run(OrderServiceApplication.class, args);
-    }
+  static void main(String[] args) {
+    SpringApplication.run(OrderServiceApplication.class, args);
+  }
 }

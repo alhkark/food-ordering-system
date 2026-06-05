@@ -1,0 +1,20 @@
+plugins {
+    id 'common-library-convention'
+    id 'logging-library-convention'
+    id 'spring-library-convention'
+}
+
+tasks.bootJar {
+    enabled = false
+}
+
+dependencies {
+    implementation project(':restaurant-service:restaurant-domain:restaurant-application-service')
+    implementation project(':common:common-data-access')
+    implementation project(':common:common-mapper')
+
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.postgresql:postgresql'
+    implementation libs.mapstruct
+    annotationProcessor libs.mapstruct.processor
+}

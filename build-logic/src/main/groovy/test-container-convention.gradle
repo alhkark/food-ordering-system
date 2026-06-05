@@ -1,0 +1,6 @@
+def libs = project.extensions.getByType(VersionCatalogsExtension).named("libs")
+
+dependencies {
+    testImplementation platform(libs.findLibrary("test.container.bom").get().get())
+    testImplementation 'org.testcontainers:junit-jupiter'
+}

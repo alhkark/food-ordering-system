@@ -1,0 +1,20 @@
+plugins {
+    id 'common-library-convention'
+    id 'logging-library-convention'
+    id 'spring-library-convention'
+}
+
+tasks.bootJar {
+    enabled = false
+}
+
+dependencies {
+    api project(':restaurant-service:restaurant-domain:restaurant-domain-core')
+    implementation project(':common:common-mapper')
+
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework:spring-tx'
+
+    implementation libs.mapstruct
+    annotationProcessor libs.mapstruct.processor
+}

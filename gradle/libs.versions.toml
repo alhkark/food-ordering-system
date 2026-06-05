@@ -10,6 +10,8 @@ mapstruct="1.6.3"
 mockito="5.21.0"
 apache-avro="1.12.1"
 apache-avro-gradle-plugin="1.2.0"
+test-container-bom="1.21.4"
+flyway-postgres="12.8.1"
 
 [libraries]
 #plugins
@@ -26,6 +28,8 @@ mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.re
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
 kafka-avro-ser = { module = "io.confluent:kafka-avro-serializer", version.ref = "confluent" }
 apache-avro = { module = "org.apache.avro:avro", version.ref = "apache-avro" }
+test-container-bom = { module = "org.testcontainers:testcontainers-bom", version.ref = "test-container-bom" }
+flyway-postgres = { module = "org.flywaydb:flyway-database-postgresql", version.ref = "flyway-postgres"}
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }

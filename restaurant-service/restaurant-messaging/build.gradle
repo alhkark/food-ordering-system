@@ -1,0 +1,23 @@
+plugins {
+    id 'common-library-convention'
+    id 'spring-library-convention'
+    id 'apache-avro-library-convention'
+    id 'logging-library-convention'
+}
+
+tasks.bootJar {
+    enabled = false
+}
+
+dependencies {
+    implementation project(':infrastructure:kafka:kafka-config-data')
+    implementation project(':restaurant-service:restaurant-domain:restaurant-application-service')
+    implementation project(':infrastructure:kafka:kafka-consumer')
+    implementation project(':infrastructure:kafka:kafka-model')
+    implementation project(':infrastructure:kafka:kafka-producer')
+    implementation project(':common:common-mapper')
+    implementation 'org.springframework.kafka:spring-kafka'
+
+    implementation libs.mapstruct
+    annotationProcessor libs.mapstruct.processor
+}

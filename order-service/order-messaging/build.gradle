@@ -15,6 +15,7 @@ dependencies {
     implementation project(':infrastructure:kafka:kafka-model')
     implementation project(':infrastructure:kafka:kafka-producer')
     implementation project(':order-service:order-domain:order-application-service')
+    implementation project(':common:common-mapper')
     implementation 'org.springframework.kafka:spring-kafka'
 
     implementation libs.mapstruct

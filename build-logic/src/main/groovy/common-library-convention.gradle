@@ -12,10 +12,6 @@ java {
     targetCompatibility = JavaVersion.VERSION_25
 }
 
-repositories {
-    mavenCentral()
-}
-
 def libs = project.extensions.getByType(VersionCatalogsExtension).named("libs")
 
 dependencies {

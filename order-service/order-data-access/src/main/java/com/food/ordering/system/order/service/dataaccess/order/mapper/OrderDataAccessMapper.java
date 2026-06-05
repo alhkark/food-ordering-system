@@ -1,6 +1,7 @@
 package com.food.ordering.system.order.service.dataaccess.order.mapper;
 
 import com.food.ordering.system.domain.valueobject.*;
+import com.food.ordering.system.mapper.UtilsMapperCommon;
 import com.food.ordering.system.order.service.dataaccess.order.entity.OrderAddressEntity;
 import com.food.ordering.system.order.service.dataaccess.order.entity.OrderEntity;
 import com.food.ordering.system.order.service.dataaccess.order.entity.OrderItemEntity;
@@ -16,40 +17,40 @@ import org.mapstruct.*;
 
 @Mapper(
     componentModel = "spring",
-    uses = {UtilsMapper.class})
-public abstract class OrderDataAccessMapper {
+    uses = {UtilsMapper.class, UtilsMapperCommon.class})
+public interface OrderDataAccessMapper {
 
-  private static final String FAILURE_MESSAGE_DELIMITER = ",";
+  String FAILURE_MESSAGE_DELIMITER = ",";
 
   @Mapping(target = "id", expression = "java(order.getId().value())")
-  @Mapping(target = "customerId", expression = "java(order.getCustomerId().value())")
-  @Mapping(target = "restaurantId", expression = "java(order.getRestaurantId().value())")
-  @Mapping(target = "trackingId", expression = "java(order.getTrackingId().trackingId())")
+  @Mapping(target = "customerId", source = "customerId.value")
+  @Mapping(target = "restaurantId", source = "restaurantId.value")
+  @Mapping(target = "trackingId", source = "trackingId.trackingId")
   @Mapping(source = "deliveryAddress", target = "address")
-  public abstract OrderEntity toOrderEntity(Order order);
+  OrderEntity toOrderEntity(Order order);
 
   @InheritInverseConfiguration
   @Mapping(source = "id", target = "orderId")
-  public abstract Order toOrder(OrderEntity orderEntity);
+  Order toOrder(OrderEntity orderEntity);
 
   @Mapping(target = "order", ignore = true)
-  public abstract OrderAddressEntity toOrderAddressEntity(StreetAddress streetAddress);
+  OrderAddressEntity toOrderAddressEntity(StreetAddress streetAddress);
 
   @Mapping(target = "id", expression = "java(orderItem.getId().orderId())")
   @Mapping(target = "order", ignore = true)
-  @Mapping(target = "productId", expression = "java(orderItem.getProduct().getId().value())")
-  public abstract OrderItemEntity toOrderItemEntity(OrderItem orderItem);
+  @Mapping(target = "productId", source = "product.id.value")
+  OrderItemEntity toOrderItemEntity(OrderItem orderItem);
 
   @Mapping(source = "id", target = "orderItemId")
   @Mapping(source = "order", target = "orderId")
   @Mapping(source = "productId", target = "product")
-  public abstract OrderItem toOrderItem(OrderItemEntity orderItemEntity);
+  OrderItem toOrderItem(OrderItemEntity orderItemEntity);
 
-  protected String toFailureMessagesDao(List<String> failureMessages) {
+  default String toFailureMessagesDao(List<String> failureMessages) {
     return failureMessages == null ? "" : String.join(FAILURE_MESSAGE_DELIMITER, failureMessages);
   }
 
-  protected List<String> toFailureMessages(String failureMessages) {
+  default List<String> toFailureMessages(String failureMessages) {
     return failureMessages == null
         ? new ArrayList<>()
         : Arrays.stream(failureMessages.split(FAILURE_MESSAGE_DELIMITER))
@@ -57,12 +58,12 @@ public abstract class OrderDataAccessMapper {
             .collect(Collectors.toCollection(ArrayList::new));
   }
 
-  protected OrderId toOrderId(OrderEntity orderEntity) {
+  default OrderId toOrderId(OrderEntity orderEntity) {
     return new OrderId(orderEntity.getId());
   }
 
   @AfterMapping
-  protected void setOrderEntity(@MappingTarget OrderEntity orderEntity) {
+  default void setOrderEntity(@MappingTarget OrderEntity orderEntity) {
     orderEntity.getAddress().setOrder(orderEntity);
     orderEntity
         .getItems()

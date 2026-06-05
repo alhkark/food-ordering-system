@@ -1,6 +1,7 @@
 package com.food.ordering.system.order.service.domain.mapper;
 
 import com.food.ordering.system.domain.valueobject.ProductId;
+import com.food.ordering.system.mapper.UtilsMapperCommon;
 import com.food.ordering.system.order.service.domain.dto.create.CreateOrderCommand;
 import com.food.ordering.system.order.service.domain.dto.create.OrderAddress;
 import com.food.ordering.system.order.service.domain.dto.create.OrderItem;
@@ -13,7 +14,7 @@ import org.mapstruct.Mapping;
 
 @Mapper(
     componentModel = "spring",
-    uses = {UtilsMapper.class})
+    uses = {UtilsMapper.class, UtilsMapperCommon.class})
 public interface CreateOrderCommandMapper {
 
   @Mapping(source = "restaurantId", target = "id")
