@@ -24,7 +24,8 @@ public class RestaurantApprovalRequestKafkaListener
 
   @Override
   @KafkaListener(
-      id = "${kafka-consumer-config.restaurant-approval-consumer-group-id}",
+      id = "restaurant-approval-request-listener",
+      groupId = "${kafka-consumer-config.restaurant-approval-request-consumer-group-id}",
       topics = "${restaurant-service.restaurant-approval-request-topic-name}")
   public void receive(
       @Payload List<RestaurantApprovalRequestAvroModel> messages,

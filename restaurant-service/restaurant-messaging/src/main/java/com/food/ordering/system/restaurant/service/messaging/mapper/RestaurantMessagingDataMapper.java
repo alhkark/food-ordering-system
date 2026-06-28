@@ -16,7 +16,7 @@ import org.mapstruct.Mapping;
 public interface RestaurantMessagingDataMapper {
 
   @Mapping(target = "id", expression = "java(java.util.UUID.randomUUID())")
-  @Mapping(target = "sagaId", ignore = true)
+  @Mapping(target = "sagaId", expression = "java(null)")
   @Mapping(target = "orderId", source = "event.orderApproval.orderId.value")
   @Mapping(target = "restaurantId", source = "event.restaurantId.value")
   @Mapping(target = "orderApprovalStatus", source = "event.orderApproval.approvalStatus")
@@ -24,7 +24,7 @@ public interface RestaurantMessagingDataMapper {
       OrderApprovedEvent event);
 
   @Mapping(target = "id", expression = "java(java.util.UUID.randomUUID())")
-  @Mapping(target = "sagaId", ignore = true)
+  @Mapping(target = "sagaId", expression = "java(null)")
   @Mapping(target = "orderId", source = "event.orderApproval.orderId.value")
   @Mapping(target = "restaurantId", source = "event.restaurantId.value")
   @Mapping(target = "orderApprovalStatus", source = "event.orderApproval.approvalStatus")

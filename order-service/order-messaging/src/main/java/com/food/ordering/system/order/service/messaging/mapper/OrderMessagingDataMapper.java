@@ -17,7 +17,7 @@ import org.mapstruct.Mapping;
 public interface OrderMessagingDataMapper {
 
   @Mapping(target = "id", expression = "java(java.util.UUID.randomUUID())")
-  @Mapping(target = "sagaId", ignore = true)
+  @Mapping(target = "sagaId", expression = "java(null)")
   @Mapping(target = "customerId", source = "order.customerId.value")
   @Mapping(target = "orderId", source = "order.id.value")
   @Mapping(target = "price", source = "order.price.amount")
@@ -26,7 +26,7 @@ public interface OrderMessagingDataMapper {
       OrderCreatedEvent orderCreatedEvent);
 
   @Mapping(target = "id", expression = "java(java.util.UUID.randomUUID())")
-  @Mapping(target = "sagaId", ignore = true)
+  @Mapping(target = "sagaId", expression = "java(null)")
   @Mapping(target = "customerId", source = "order.customerId.value")
   @Mapping(target = "orderId", source = "order.id.value")
   @Mapping(target = "price", source = "order.price.amount")
@@ -35,7 +35,7 @@ public interface OrderMessagingDataMapper {
       OrderCancelledEvent orderCancelledEvent);
 
   @Mapping(target = "id", expression = "java(java.util.UUID.randomUUID())")
-  @Mapping(target = "sagaId", ignore = true)
+  @Mapping(target = "sagaId", expression = "java(null)")
   @Mapping(target = "orderId", source = "order.id.value")
   @Mapping(target = "restaurantId", source = "order.restaurantId.value")
   @Mapping(target = "products", source = "order.items")

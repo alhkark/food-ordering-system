@@ -11,6 +11,8 @@ restaurant-service:
   restaurant-approval-response-topic-name: restaurant-approval-response
 
 spring:
+  main:
+    keep-alive: true
   jpa:
     open-in-view: false
     hibernate:
@@ -18,7 +20,7 @@ spring:
     show-sql: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/postgres?currentSchema=order&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/postgres?currentSchema=restaurant&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
     password: ${SPRING_DATASOURCE_PASSWORD:admin}
     driver-class-name: org.postgresql.Driver
@@ -31,7 +33,7 @@ spring:
     table: flyway_schema_history
 
 kafka-config:
-  bootstrap-servers: localhost:19092, localhost:29092, localhost:39092
+  bootstrap-servers: localhost:29092, localhost:39092, localhost:49092
   schema-registry-url-key: schema.registry.url
   schema-registry-url: http://localhost:8081
   num-of-partitions: 3
@@ -51,7 +53,7 @@ kafka-producer-config:
 kafka-consumer-config:
   key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
   value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
-  restaurant-approval-consumer-group-id: restaurant-approval-topic-consumer
+  restaurant-approval-request-consumer-group-id: restaurant-approval-request-consumer
   auto-offset-reset: earliest
   specific-avro-reader-key: specific.avro.reader
   specific-avro-reader: true

@@ -19,7 +19,7 @@ import org.mapstruct.Named;
 public interface PaymentMessagingDataMapper {
 
   @Mapping(target = "id", expression = "java(java.util.UUID.randomUUID())")
-  @Mapping(target = "sagaId", ignore = true)
+  @Mapping(target = "sagaId", expression = "java(null)")
   @Mapping(target = "paymentId", source = "payment.id.value")
   @Mapping(target = "customerId", source = "payment.customerId.value")
   @Mapping(target = "orderId", source = "payment.orderId.value")
@@ -29,7 +29,7 @@ public interface PaymentMessagingDataMapper {
   PaymentResponseAvroModel toPaymentResponseAvroModel(PaymentCompletedEvent paymentCompletedEvent);
 
   @Mapping(target = "id", expression = "java(java.util.UUID.randomUUID())")
-  @Mapping(target = "sagaId", ignore = true)
+  @Mapping(target = "sagaId", expression = "java(null)")
   @Mapping(target = "paymentId", source = "payment.id.value")
   @Mapping(target = "customerId", source = "payment.customerId.value")
   @Mapping(target = "orderId", source = "payment.orderId.value")
@@ -39,7 +39,7 @@ public interface PaymentMessagingDataMapper {
   PaymentResponseAvroModel toPaymentResponseAvroModel(PaymentCancelledEvent paymentCancelledEvent);
 
   @Mapping(target = "id", expression = "java(java.util.UUID.randomUUID())")
-  @Mapping(target = "sagaId", ignore = true)
+  @Mapping(target = "sagaId", expression = "java(null)")
   @Mapping(target = "paymentId", source = "payment.id.value")
   @Mapping(target = "customerId", source = "payment.customerId.value")
   @Mapping(target = "orderId", source = "payment.orderId.value")
