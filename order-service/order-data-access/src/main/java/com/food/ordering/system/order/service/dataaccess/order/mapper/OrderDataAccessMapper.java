@@ -1,5 +1,7 @@
 package com.food.ordering.system.order.service.dataaccess.order.mapper;
 
+import static com.food.ordering.system.domain.DomainConstants.FAILURE_MESSAGE_DELIMITER;
+
 import com.food.ordering.system.domain.valueobject.*;
 import com.food.ordering.system.mapper.UtilsMapperCommon;
 import com.food.ordering.system.order.service.dataaccess.order.entity.OrderAddressEntity;
@@ -19,8 +21,6 @@ import org.mapstruct.*;
     componentModel = "spring",
     uses = {UtilsMapper.class, UtilsMapperCommon.class})
 public interface OrderDataAccessMapper {
-
-  String FAILURE_MESSAGE_DELIMITER = ",";
 
   @Mapping(target = "id", expression = "java(order.getId().value())")
   @Mapping(target = "customerId", source = "customerId.value")
