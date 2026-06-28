@@ -51,7 +51,7 @@ public interface OrderDataAccessMapper {
   }
 
   default List<String> toFailureMessages(String failureMessages) {
-    return failureMessages == null
+    return failureMessages == null || failureMessages.isBlank()
         ? new ArrayList<>()
         : Arrays.stream(failureMessages.split(FAILURE_MESSAGE_DELIMITER))
             .map(String::trim)
