@@ -2,7 +2,6 @@ package com.food.ordering.system.restaurant.service.domain;
 
 import static com.food.ordering.system.domain.DomainConstants.UTC;
 
-import com.food.ordering.system.domain.event.publisher.DomainEventPublisher;
 import com.food.ordering.system.domain.valueobject.OrderApprovalStatus;
 import com.food.ordering.system.restaurant.service.domain.annotation.DomainService;
 import com.food.ordering.system.restaurant.service.domain.entity.Restaurant;
@@ -19,11 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 public class RestaurantDomainServiceImpl implements RestaurantDomainService {
 
   @Override
-  public OrderApprovalEvent validateOrder(
-      Restaurant restaurant,
-      List<String> failureMessages,
-      DomainEventPublisher<OrderApprovedEvent> orderApprovedEventDomainEventPublisher,
-      DomainEventPublisher<OrderRejectedEvent> orderRejectedEventDomainEventPublisher) {
+  public OrderApprovalEvent validateOrder(Restaurant restaurant, List<String> failureMessages) {
     restaurant.validateOrder(failureMessages);
     log.info("Validating order with id: {}", restaurant.getOrderDetail().getId().value());
 
@@ -34,8 +29,7 @@ public class RestaurantDomainServiceImpl implements RestaurantDomainService {
           restaurant.getOrderApproval(),
           restaurant.getId(),
           failureMessages,
-          ZonedDateTime.now(ZoneId.of(UTC)),
-          orderApprovedEventDomainEventPublisher);
+          ZonedDateTime.now(ZoneId.of(UTC)));
     } else {
       log.info("Order is rejected for order id: {}", restaurant.getOrderDetail().getId().value());
       restaurant.constructOrderApproval(OrderApprovalStatus.REJECTED);
@@ -43,8 +37,7 @@ public class RestaurantDomainServiceImpl implements RestaurantDomainService {
           restaurant.getOrderApproval(),
           restaurant.getId(),
           failureMessages,
-          ZonedDateTime.now(ZoneId.of(UTC)),
-          orderRejectedEventDomainEventPublisher);
+          ZonedDateTime.now(ZoneId.of(UTC)));
     }
   }
 }

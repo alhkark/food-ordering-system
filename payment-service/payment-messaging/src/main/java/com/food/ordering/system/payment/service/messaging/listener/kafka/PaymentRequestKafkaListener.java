@@ -3,11 +3,16 @@ package com.food.ordering.system.payment.service.messaging.listener.kafka;
 import com.food.ordering.system.kafka.consumer.KafkaConsumer;
 import com.food.ordering.system.kafka.order.avro.model.PaymentOrderStatus;
 import com.food.ordering.system.kafka.order.avro.model.PaymentRequestAvroModel;
+import com.food.ordering.system.payment.service.domain.exception.PaymentApplicationServiceException;
+import com.food.ordering.system.payment.service.domain.exception.PaymentNotFoundException;
 import com.food.ordering.system.payment.service.domain.ports.input.message.listener.PaymentRequestMessageListener;
 import com.food.ordering.system.payment.service.messaging.mapper.PaymentMessagingDataMapper;
+import java.sql.SQLException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.postgresql.util.PSQLState;
+import org.springframework.dao.DataAccessException;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
@@ -41,16 +46,49 @@ public class PaymentRequestKafkaListener implements KafkaConsumer<PaymentRequest
 
     messages.forEach(
         paymentRequestAvroModel -> {
-          if (PaymentOrderStatus.PENDING == paymentRequestAvroModel.getPaymentOrderStatus()) {
-            log.info("Processing payment for order id: {}", paymentRequestAvroModel.getOrderId());
-            paymentRequestMessageListener.completePayment(
-                paymentMessagingDataMapper.toPaymentRequest(paymentRequestAvroModel));
-          } else if (PaymentOrderStatus.CANCELLED
-              == paymentRequestAvroModel.getPaymentOrderStatus()) {
-            log.info("Cancelling payment for order id: {}", paymentRequestAvroModel.getOrderId());
-            paymentRequestMessageListener.cancelPayment(
-                paymentMessagingDataMapper.toPaymentRequest(paymentRequestAvroModel));
+          try {
+            if (PaymentOrderStatus.PENDING == paymentRequestAvroModel.getPaymentOrderStatus()) {
+              log.info("Processing payment for order id: {}", paymentRequestAvroModel.getOrderId());
+              paymentRequestMessageListener.completePayment(
+                  paymentMessagingDataMapper.toPaymentRequest(paymentRequestAvroModel));
+            } else if (PaymentOrderStatus.CANCELLED
+                == paymentRequestAvroModel.getPaymentOrderStatus()) {
+              log.info("Cancelling payment for order id: {}", paymentRequestAvroModel.getOrderId());
+              paymentRequestMessageListener.cancelPayment(
+                  paymentMessagingDataMapper.toPaymentRequest(paymentRequestAvroModel));
+            }
+          } catch (DataAccessException e) {
+            SQLException sqlException = (SQLException) e.getRootCause();
+            if (sqlException != null
+                && sqlException.getSQLState() != null
+                && PSQLState.UNIQUE_VIOLATION.getState().equals(sqlException.getSQLState())) {
+              // NO-OP for unique constraint exception
+              log.error(
+                  "Caught unique constraint exception with sql state: {} "
+                      + "in PaymentRequestKafkaListener for order id: {}",
+                  sqlException.getSQLState(),
+                  paymentRequestAvroModel.getOrderId());
+            } else {
+              throw new PaymentApplicationServiceException(
+                  "Throwing DataAccessException in"
+                      + " PaymentRequestKafkaListener: "
+                      + e.getMessage(),
+                  e);
+            }
+          } catch (PaymentNotFoundException e) {
+            // NO-OP for PaymentNotFoundException
+            log.error("No payment found for order id: {}", paymentRequestAvroModel.getOrderId());
           }
         });
+  }
+
+  @KafkaListener(
+      id = "payment-request-listener-dlt",
+      topics = "${payment-service.payment-request-topic-name}.DLT",
+      groupId = "${kafka-consumer-config.payment-request-dlt-consumer-group-id}")
+  public void handleDlt(
+      @Payload PaymentRequestAvroModel message,
+      @Header(KafkaHeaders.EXCEPTION_MESSAGE) String errorMessage) {
+    log.error("Poison message in DLT: orderId={}, error={}", message.getOrderId(), errorMessage);
   }
 }

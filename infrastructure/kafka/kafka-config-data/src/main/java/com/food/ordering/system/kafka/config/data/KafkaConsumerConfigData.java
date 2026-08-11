@@ -23,4 +23,7 @@ public class KafkaConsumerConfigData {
   private Integer maxPollRecords;
   private Integer maxPartitionFetchBytesDefault;
   private Integer maxPartitionFetchBytesBoostFactor;
+  private Long retryIntervalMs = 2000L;
+  private Integer retryMaxAttempts = 3;
+  private String dltSuffix = ".DLT";
 }

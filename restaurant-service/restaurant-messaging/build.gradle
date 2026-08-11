@@ -16,7 +16,9 @@ dependencies {
     implementation project(':infrastructure:kafka:kafka-model')
     implementation project(':infrastructure:kafka:kafka-producer')
     implementation project(':common:common-mapper')
+    implementation project(':infrastructure:outbox')
     implementation 'org.springframework.kafka:spring-kafka'
+    implementation 'org.postgresql:postgresql'
 
     implementation libs.mapstruct
     annotationProcessor libs.mapstruct.processor

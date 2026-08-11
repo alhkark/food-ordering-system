@@ -2,12 +2,15 @@ package com.food.ordering.system.order.service.messaging.listener.kafka;
 
 import com.food.ordering.system.kafka.consumer.KafkaConsumer;
 import com.food.ordering.system.kafka.order.avro.model.OrderApprovalStatus;
+import com.food.ordering.system.kafka.order.avro.model.PaymentResponseAvroModel;
 import com.food.ordering.system.kafka.order.avro.model.RestaurantApprovalResponseAvroModel;
+import com.food.ordering.system.order.service.domain.exception.OrderNotFoundException;
 import com.food.ordering.system.order.service.domain.ports.input.message.listener.restaurantapproval.RestaurantApprovalResponseMessageListener;
 import com.food.ordering.system.order.service.messaging.mapper.OrderMessagingDataMapper;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
@@ -41,26 +44,46 @@ public class RestaurantApprovalResponseKafkaListener
         offsets);
     messages.forEach(
         restaurantApprovalResponseAvroModel -> {
-          if (OrderApprovalStatus.APPROVED
-              == restaurantApprovalResponseAvroModel.getOrderApprovalStatus()) {
-            log.info(
-                "Processing approved order for order id : {}",
+          try {
+            if (OrderApprovalStatus.APPROVED
+                == restaurantApprovalResponseAvroModel.getOrderApprovalStatus()) {
+              log.info(
+                  "Processing approved order for order id : {}",
+                  restaurantApprovalResponseAvroModel.getOrderId());
+              restaurantApprovalResponseMessageListener.orderApproved(
+                  orderMessagingDataMapper
+                      .restaurantApprovalResponseAvroModelToRestaurantApprovalResponse(
+                          restaurantApprovalResponseAvroModel));
+            } else if (OrderApprovalStatus.REJECTED
+                == restaurantApprovalResponseAvroModel.getOrderApprovalStatus()) {
+              log.info(
+                  "Processing rejected order for order id : {}, with failure message: {}",
+                  restaurantApprovalResponseAvroModel.getOrderId(),
+                  restaurantApprovalResponseAvroModel.getFailureMessages());
+              restaurantApprovalResponseMessageListener.orderRejected(
+                  orderMessagingDataMapper
+                      .restaurantApprovalResponseAvroModelToRestaurantApprovalResponse(
+                          restaurantApprovalResponseAvroModel));
+            }
+          } catch (OptimisticLockingFailureException e) {
+            log.error(
+                "Caught optimistic locking exception in PaymentResponseKafkaListener for order id: {}",
                 restaurantApprovalResponseAvroModel.getOrderId());
-            restaurantApprovalResponseMessageListener.orderApproved(
-                orderMessagingDataMapper
-                    .restaurantApprovalResponseAvroModelToRestaurantApprovalResponse(
-                        restaurantApprovalResponseAvroModel));
-          } else if (OrderApprovalStatus.REJECTED
-              == restaurantApprovalResponseAvroModel.getOrderApprovalStatus()) {
-            log.info(
-                "Processing rejected order for order id : {}, with failure message: {}",
-                restaurantApprovalResponseAvroModel.getOrderId(),
-                restaurantApprovalResponseAvroModel.getFailureMessages());
-            restaurantApprovalResponseMessageListener.orderRejected(
-                orderMessagingDataMapper
-                    .restaurantApprovalResponseAvroModelToRestaurantApprovalResponse(
-                        restaurantApprovalResponseAvroModel));
+          } catch (OrderNotFoundException e) {
+            log.error(
+                "No order found for order id: {}",
+                restaurantApprovalResponseAvroModel.getOrderId());
           }
         });
+  }
+
+  @KafkaListener(
+      id = "restaurant-approval-response-listener-dlt",
+      topics = "${order-service.restaurant-approval-response-topic-name}.DLT",
+      groupId = "${kafka-consumer-config.restaurant-approval-response-dlt-consumer-group-id}")
+  public void handleDlt(
+      @Payload PaymentResponseAvroModel message,
+      @Header(KafkaHeaders.EXCEPTION_MESSAGE) String errorMessage) {
+    log.error("Poison message in DLT: orderId={}, error={}", message.getOrderId(), errorMessage);
   }
 }

@@ -2,15 +2,10 @@ package com.food.ordering.system.order.service.domain;
 
 import com.food.ordering.system.order.service.domain.dto.create.CreateOrderCommand;
 import com.food.ordering.system.order.service.domain.dto.create.CreateOrderResponse;
-import com.food.ordering.system.order.service.domain.entity.Order;
-import com.food.ordering.system.order.service.domain.entity.Restaurant;
-import com.food.ordering.system.order.service.domain.exception.OrderDomainException;
-import com.food.ordering.system.order.service.domain.mapper.CreateOrderCommandMapper;
+import com.food.ordering.system.order.service.domain.event.OrderCreatedEvent;
 import com.food.ordering.system.order.service.domain.mapper.OrderMapper;
-import com.food.ordering.system.order.service.domain.ports.output.message.publisher.payment.OrderCreatedPaymentRequestMessagePublisher;
-import com.food.ordering.system.order.service.domain.ports.output.repository.CustomerRepository;
-import com.food.ordering.system.order.service.domain.ports.output.repository.OrderRepository;
-import com.food.ordering.system.order.service.domain.ports.output.repository.RestaurantRepository;
+import com.food.ordering.system.order.service.domain.outbox.scheduler.payment.PaymentOutboxHelper;
+import com.food.ordering.system.outbox.OutboxStatus;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,60 +17,27 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 public class OrderCreateCommandHandler {
 
-  private final OrderDomainService orderDomainService;
-
-  private final OrderRepository orderRepository;
-
-  private final CustomerRepository customerRepository;
-
-  private final RestaurantRepository restaurantRepository;
-
-  private final CreateOrderCommandMapper createOrderCommandMapper;
-
+  private final OrderCreateHelper orderCreateHelper;
   private final OrderMapper orderMapper;
-
-  private final OrderCreatedPaymentRequestMessagePublisher
-      orderCreatedPaymentRequestMessagePublisher;
+  private final PaymentOutboxHelper paymentOutboxHelper;
+  private final OrderSagaHelper orderSagaHelper;
 
   @Transactional
   public CreateOrderResponse createOrder(CreateOrderCommand createOrderCommand) {
-    checkCustomer(createOrderCommand.customerId());
-    var restaurant = checkRestaurant(createOrderCommand);
-    var order = createOrderCommandMapper.toOrder(createOrderCommand);
-    var orderCreatedEvent =
-        orderDomainService.validateAndInitiateOrder(
-            order, restaurant, orderCreatedPaymentRequestMessagePublisher);
-    orderCreatedPaymentRequestMessagePublisher.publish(orderCreatedEvent);
-    var orderResult = saveOrder(order);
-    log.info("Order is created with id: {}", orderResult.getId().value());
-    return orderMapper.toCreateOrderResponse(orderResult, "Order created successfully");
-  }
+    OrderCreatedEvent orderCreatedEvent = orderCreateHelper.persistOrder(createOrderCommand);
+    log.info("Order is created with id: {}", orderCreatedEvent.order().getId().value());
+    CreateOrderResponse createOrderResponse =
+        orderMapper.toCreateOrderResponse(orderCreatedEvent.order(), "Order created successfully");
 
-  private Restaurant checkRestaurant(CreateOrderCommand createOrderCommand) {
-    var restaurant = createOrderCommandMapper.toRestaurant(createOrderCommand);
-    var optionalRestaurant = restaurantRepository.findRestaurantInformation(restaurant);
-    return optionalRestaurant.orElseThrow(
-        () -> {
-          log.warn("Could not find restaurant with id: {}", createOrderCommand.restaurantId());
-          return new OrderDomainException("Restaurant not found");
-        });
-  }
+    paymentOutboxHelper.savePaymentOutboxMessage(
+        orderMapper.toOrderPaymentEventPayload(orderCreatedEvent),
+        orderCreatedEvent.order().getOrderStatus(),
+        orderSagaHelper.orderStatusToSagaStatus(orderCreatedEvent.order().getOrderStatus()),
+        OutboxStatus.STARTED,
+        UUID.randomUUID());
 
-  private void checkCustomer(UUID customerId) {
-    var optionalCustomer = customerRepository.findCustomer(customerId);
-    if (optionalCustomer.isEmpty()) {
-      log.warn("Could not find customer with id: {}", customerId);
-      throw new OrderDomainException("Could not find customer with id: " + customerId);
-    }
-  }
+    log.info("Returning CreateOrderResponse with order id: {}", orderCreatedEvent.order().getId());
 
-  private Order saveOrder(Order order) {
-    var savedOrder = orderRepository.save(order);
-    if (savedOrder == null) {
-      log.error("Could not save order!");
-      throw new OrderDomainException("Could not save order!");
-    }
-    log.info("Order with id: {} is saved", savedOrder.getId().value());
-    return savedOrder;
+    return createOrderResponse;
   }
 }

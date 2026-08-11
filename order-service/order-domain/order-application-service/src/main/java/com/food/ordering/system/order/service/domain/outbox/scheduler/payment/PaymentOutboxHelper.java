@@ -1,0 +1,108 @@
+package com.food.ordering.system.order.service.domain.outbox.scheduler.payment;
+
+import static com.food.ordering.system.saga.order.SagaConstants.ORDER_SAGA_NAME;
+
+import com.food.ordering.system.domain.valueobject.OrderStatus;
+import com.food.ordering.system.order.service.domain.exception.OrderDomainException;
+import com.food.ordering.system.order.service.domain.outbox.model.payment.OrderPaymentEventPayload;
+import com.food.ordering.system.order.service.domain.outbox.model.payment.OrderPaymentOutboxMessage;
+import com.food.ordering.system.order.service.domain.ports.output.repository.ArchivePaymentOutboxRepository;
+import com.food.ordering.system.order.service.domain.ports.output.repository.PaymentOutboxRepository;
+import com.food.ordering.system.outbox.OutboxStatus;
+import com.food.ordering.system.saga.SagaStatus;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
+
+@Slf4j
+@RequiredArgsConstructor
+@Component
+public class PaymentOutboxHelper {
+
+  private final PaymentOutboxRepository paymentOutboxRepository;
+  private final ArchivePaymentOutboxRepository archivePaymentOutboxRepository;
+  private final JsonMapper jsonMapper;
+
+  @Transactional(readOnly = true)
+  public List<OrderPaymentOutboxMessage> getPaymentOutboxMessageByOutboxStatusAndSagaStatus(
+      OutboxStatus outboxStatus, SagaStatus... sagaStatus) {
+    return paymentOutboxRepository.findByTypeAndOutboxStatusAndSagaStatus(
+        ORDER_SAGA_NAME, outboxStatus, sagaStatus);
+  }
+
+  @Transactional(readOnly = true)
+  public Optional<OrderPaymentOutboxMessage> getPaymentOutboxMessageBySagaIdAndSagaStatus(
+      UUID sagaId, SagaStatus... sagaStatus) {
+    return paymentOutboxRepository.findByTypeAndSagaIdAndSagaStatus(
+        ORDER_SAGA_NAME, sagaId, sagaStatus);
+  }
+
+  @Transactional
+  public void save(OrderPaymentOutboxMessage orderPaymentOutboxMessage) {
+    OrderPaymentOutboxMessage response = paymentOutboxRepository.save(orderPaymentOutboxMessage);
+    if (response == null) {
+      log.error(
+          "Could not save OrderPaymentOutboxMessage with outbox id: {}",
+          orderPaymentOutboxMessage.getId());
+      throw new OrderDomainException(
+          "Could not save OrderPaymentOutboxMessage with outbox id: "
+              + orderPaymentOutboxMessage.getId());
+    }
+    log.info(
+        "OrderPaymentOutboxMessage saved with outbox id: {}", orderPaymentOutboxMessage.getId());
+  }
+
+  @Transactional
+  public void archivePaymentOutboxRepository(
+      List<OrderPaymentOutboxMessage> orderPaymentOutboxMessages) {
+    archivePaymentOutboxRepository.saveAll(orderPaymentOutboxMessages);
+  }
+
+  @Transactional
+  public void savePaymentOutboxMessage(
+      OrderPaymentEventPayload paymentEventPayload,
+      OrderStatus orderStatus,
+      SagaStatus sagaStatus,
+      OutboxStatus outboxStatus,
+      UUID sagaId) {
+    save(
+        OrderPaymentOutboxMessage.builder()
+            .id(UUID.randomUUID())
+            .sagaId(sagaId)
+            .createdAt(paymentEventPayload.createdAt())
+            .type(ORDER_SAGA_NAME)
+            .payload(createPayload(paymentEventPayload))
+            .orderStatus(orderStatus)
+            .sagaStatus(sagaStatus)
+            .outboxStatus(outboxStatus)
+            .build());
+  }
+
+  @Transactional
+  public void deletePaymentOutboxMessageByOutboxStatusAndSagaStatus(
+      OutboxStatus outboxStatus, SagaStatus... sagaStatus) {
+    paymentOutboxRepository.deleteByTypeAndOutboxStatusAndSagaStatus(
+        ORDER_SAGA_NAME, outboxStatus, sagaStatus);
+  }
+
+  private String createPayload(OrderPaymentEventPayload paymentEventPayload) {
+    try {
+      return jsonMapper.writeValueAsString(paymentEventPayload);
+    } catch (JacksonException e) {
+      log.error(
+          "Could not create OrderPaymentEventPayload object for order id: {}",
+          paymentEventPayload.orderId(),
+          e);
+      throw new OrderDomainException(
+          "Could not create OrderPaymentEventPayload object for order id: "
+              + paymentEventPayload.orderId(),
+          e);
+    }
+  }
+}

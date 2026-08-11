@@ -4,11 +4,19 @@ server:
 logging:
   level:
     com.food.ordering.system: DEBUG
-    liquibase: DEBUG
+    org.flywaydb: DEBUG
+    org.springframework.kafka: ERROR
+    org.apache.kafka: ERROR
+    org.apache.kafka.clients.consumer: ERROR
+    org.apache.kafka.clients.producer: ERROR
 
 restaurant-service:
   restaurant-approval-request-topic-name: restaurant-approval-request
   restaurant-approval-response-topic-name: restaurant-approval-response
+  outbox-scheduler-fixed-rate: 10000
+  outbox-scheduler-initial-delay: 10000
+archive:
+  jdbc-batch-size: 30
 
 spring:
   main:
@@ -18,7 +26,10 @@ spring:
     hibernate:
       ddl-auto: none
     show-sql: true
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        format_sql: true
+        highlight_sql: true
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/postgres?currentSchema=restaurant&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
@@ -28,7 +39,7 @@ spring:
     enabled: true
     locations: classpath:db/migration
     schemas: restaurant
-    default-schema: restaurant
+    default-schema: restaurant_flyway
     baseline-on-migrate: false
     table: flyway_schema_history
 
@@ -54,6 +65,7 @@ kafka-consumer-config:
   key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
   value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
   restaurant-approval-request-consumer-group-id: restaurant-approval-request-consumer
+  restaurant-approval-request-dlt-consumer-group-id: restaurant-approval-request-dlt-consumer
   auto-offset-reset: earliest
   specific-avro-reader-key: specific.avro.reader
   specific-avro-reader: true
@@ -67,3 +79,6 @@ kafka-consumer-config:
   max-partition-fetch-bytes-default: 1048576
   max-partition-fetch-bytes-boost-factor: 1
   poll-timeout-ms: 150
+  retry-interval-ms: 2000
+  retry-max-attempts: 3
+  dlt-suffix: .DLT

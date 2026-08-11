@@ -6,6 +6,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Getter
 @Setter
@@ -22,6 +24,7 @@ public class OrderEntity {
   private UUID trackingId;
   private BigDecimal price;
 
+  @JdbcTypeCode(SqlTypes.NAMED_ENUM)
   @Enumerated(EnumType.STRING)
   private OrderStatus orderStatus;
 

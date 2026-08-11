@@ -1,7 +1,13 @@
 spring:
-  jpa:
-    hibernate:
-      ddl-auto: none
-  liquibase:
+  datasource:
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+  flyway:
     enabled: true
-    change-log: classpath:db/changelog/db.changelog-master.yaml
+    locations: classpath:db/migration
+    schemas: order
+    default-schema: order_flyway
+    baseline-on-migrate: false
+    table: flyway_schema_history

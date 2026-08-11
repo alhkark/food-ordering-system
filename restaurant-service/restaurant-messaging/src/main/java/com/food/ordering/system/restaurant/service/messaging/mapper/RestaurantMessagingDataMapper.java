@@ -7,29 +7,12 @@ import com.food.ordering.system.kafka.order.avro.model.RestaurantApprovalRespons
 import com.food.ordering.system.mapper.UtilsMapperCommon;
 import com.food.ordering.system.restaurant.service.domain.dto.RestaurantApprovalRequest;
 import com.food.ordering.system.restaurant.service.domain.entity.Product;
-import com.food.ordering.system.restaurant.service.domain.event.OrderApprovedEvent;
-import com.food.ordering.system.restaurant.service.domain.event.OrderRejectedEvent;
+import com.food.ordering.system.restaurant.service.domain.outbox.model.OrderEventPayload;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring", uses = UtilsMapperCommon.class)
 public interface RestaurantMessagingDataMapper {
-
-  @Mapping(target = "id", expression = "java(java.util.UUID.randomUUID())")
-  @Mapping(target = "sagaId", expression = "java(null)")
-  @Mapping(target = "orderId", source = "event.orderApproval.orderId.value")
-  @Mapping(target = "restaurantId", source = "event.restaurantId.value")
-  @Mapping(target = "orderApprovalStatus", source = "event.orderApproval.approvalStatus")
-  RestaurantApprovalResponseAvroModel orderApprovedEventToRestaurantApprovalResponseAvroModel(
-      OrderApprovedEvent event);
-
-  @Mapping(target = "id", expression = "java(java.util.UUID.randomUUID())")
-  @Mapping(target = "sagaId", expression = "java(null)")
-  @Mapping(target = "orderId", source = "event.orderApproval.orderId.value")
-  @Mapping(target = "restaurantId", source = "event.restaurantId.value")
-  @Mapping(target = "orderApprovalStatus", source = "event.orderApproval.approvalStatus")
-  RestaurantApprovalResponseAvroModel orderRejectedEventToRestaurantApprovalResponseAvroModel(
-      OrderRejectedEvent event);
 
   @Mapping(
       target = "restaurantOrderStatus",
@@ -46,6 +29,11 @@ public interface RestaurantMessagingDataMapper {
   @Mapping(target = "price", ignore = true)
   @Mapping(target = "available", ignore = true)
   Product toProduct(com.food.ordering.system.kafka.order.avro.model.Product avroProduct);
+
+  @Mapping(target = "id", expression = "java(java.util.UUID.randomUUID())")
+  @Mapping(target = "sagaId", source = "sagaId")
+  RestaurantApprovalResponseAvroModel toRestaurantApprovalResponseAvroModel(
+      OrderEventPayload orderEventPayload, String sagaId);
 
   default com.food.ordering.system.kafka.order.avro.model.OrderApprovalStatus
       toAvroOrderApprovalStatus(OrderApprovalStatus orderApproval) {

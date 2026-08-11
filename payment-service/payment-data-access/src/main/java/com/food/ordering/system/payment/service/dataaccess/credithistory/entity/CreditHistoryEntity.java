@@ -6,6 +6,8 @@ import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Getter
 @Setter
@@ -20,6 +22,7 @@ public class CreditHistoryEntity {
   private UUID customerId;
   private BigDecimal amount;
 
+  @JdbcTypeCode(SqlTypes.NAMED_ENUM)
   @Enumerated(EnumType.STRING)
   private TransactionType type;
 

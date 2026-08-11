@@ -5,10 +5,11 @@ import com.food.ordering.system.kafka.producer.service.KafkaProducer;
 import jakarta.annotation.PreDestroy;
 import java.io.Serializable;
 import java.util.Optional;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.specific.SpecificRecordBase;
+import org.springframework.kafka.KafkaException;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
@@ -22,23 +23,21 @@ public class KafkaProducerImpl<K extends Serializable, V extends SpecificRecordB
   private final KafkaTemplate<K, V> kafkaTemplate;
 
   @Override
-  public void send(String topicName, K key, V message, Consumer<SendResult<K, V>> callback) {
+  public void send(
+      String topicName, K key, V message, BiConsumer<SendResult<K, V>, Throwable> callback) {
     log.info("Sending record to topic: {}, key: {}, message: {}", topicName, key, message);
-    var kafkaResultFuture = kafkaTemplate.send(topicName, key, message);
-    kafkaResultFuture.whenComplete(
-        (result, e) -> {
-          if (e != null) {
-            log.error(
-                "Error on kafka producer with topic: {}, key: {}, message: {}, exception: {}",
-                topicName,
-                key,
-                message,
-                e.getMessage());
-            throw new KafkaProducerException(
-                "Error on kafka producer with key: " + key + " and message: " + message);
-          }
-          callback.accept(result);
-        });
+    try {
+      var kafkaResultFuture = kafkaTemplate.send(topicName, key, message);
+      kafkaResultFuture.whenComplete(callback);
+    } catch (KafkaException e) {
+      log.error(
+          "Error on kafka producer with key: {}, message: {} and exception: {}",
+          key,
+          message,
+          e.getMessage());
+      throw new KafkaProducerException(
+          "Error on kafka producer with key: " + key + " and message: " + message);
+    }
   }
 
   @PreDestroy

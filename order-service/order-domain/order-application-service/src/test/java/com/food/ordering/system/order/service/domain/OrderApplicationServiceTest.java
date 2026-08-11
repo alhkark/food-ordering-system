@@ -1,5 +1,6 @@
 package com.food.ordering.system.order.service.domain;
 
+import static com.food.ordering.system.saga.order.SagaConstants.ORDER_SAGA_NAME;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -16,8 +17,13 @@ import com.food.ordering.system.order.service.domain.entity.Restaurant;
 import com.food.ordering.system.order.service.domain.exception.OrderDomainException;
 import com.food.ordering.system.order.service.domain.mapper.CreateOrderCommandMapper;
 import com.food.ordering.system.order.service.domain.mapper.OrderMapper;
+import com.food.ordering.system.order.service.domain.outbox.model.payment.OrderPaymentEventPayload;
+import com.food.ordering.system.order.service.domain.outbox.model.payment.OrderPaymentOutboxMessage;
 import com.food.ordering.system.order.service.domain.ports.input.service.OrderApplicationService;
+import com.food.ordering.system.outbox.OutboxStatus;
+import com.food.ordering.system.saga.SagaStatus;
 import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -26,6 +32,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class OrderApplicationServiceTest extends BaseTest {
@@ -36,6 +44,8 @@ public class OrderApplicationServiceTest extends BaseTest {
 
   @Autowired CreateOrderCommandMapper createOrderCommandMapper;
 
+  @Autowired JsonMapper jsonMapper;
+
   CreateOrderCommand createOrderCommand;
   CreateOrderCommand createOrderCommandWrongPrice;
   CreateOrderCommand createOrderCommandWrongProductPrice;
@@ -45,6 +55,7 @@ public class OrderApplicationServiceTest extends BaseTest {
   final UUID RESTAURANT_ID = UUID.fromString("6e446872-bbeb-43f4-8915-6f5ac60f80c0");
   final UUID PRODUCT_ID = UUID.fromString("c3304d12-2f65-4948-baed-1c871bb7025e");
   final UUID ORDER_ID = UUID.fromString("4ac18f1a-f6cd-4eda-b73f-1536eed16648");
+  final UUID SAGA_ID = UUID.fromString("15a497c1-0f4b-4eff-b9f4-c402c8c07afa");
   final BigDecimal PRICE = new BigDecimal("200.00");
 
   @BeforeAll
@@ -136,6 +147,8 @@ public class OrderApplicationServiceTest extends BaseTest {
               orderSaved.setId(new OrderId(ORDER_ID));
               return orderSaved;
             });
+    when(paymentOutboxRepository.save(any(OrderPaymentOutboxMessage.class)))
+        .thenReturn(getOrderPaymentOutboxMessage());
   }
 
   @Test
@@ -186,5 +199,36 @@ public class OrderApplicationServiceTest extends BaseTest {
     assertThatThrownBy(() -> orderApplicationService.createOrder(createOrderCommand))
         .isInstanceOf(OrderDomainException.class)
         .hasMessage("Restaurant with id %s is currently not active!", RESTAURANT_ID);
+  }
+
+  private OrderPaymentOutboxMessage getOrderPaymentOutboxMessage() {
+    OrderPaymentEventPayload orderPaymentEventPayload =
+        OrderPaymentEventPayload.builder()
+            .orderId(ORDER_ID.toString())
+            .customerId(CUSTOMER_ID.toString())
+            .price(PRICE)
+            .createdAt(ZonedDateTime.now())
+            .paymentOrderStatus(PaymentOrderStatus.PENDING.name())
+            .build();
+
+    return OrderPaymentOutboxMessage.builder()
+        .id(UUID.randomUUID())
+        .sagaId(SAGA_ID)
+        .createdAt(ZonedDateTime.now())
+        .type(ORDER_SAGA_NAME)
+        .payload(createPayload(orderPaymentEventPayload))
+        .orderStatus(OrderStatus.PENDING)
+        .sagaStatus(SagaStatus.STARTED)
+        .outboxStatus(OutboxStatus.STARTED)
+        .version(0)
+        .build();
+  }
+
+  private String createPayload(OrderPaymentEventPayload orderPaymentEventPayload) {
+    try {
+      return jsonMapper.writeValueAsString(orderPaymentEventPayload);
+    } catch (JacksonException e) {
+      throw new OrderDomainException("Cannot create OrderPaymentEventPayload object!");
+    }
   }
 }

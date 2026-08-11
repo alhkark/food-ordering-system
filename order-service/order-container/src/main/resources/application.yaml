@@ -4,13 +4,21 @@ server:
 logging:
   level:
     com.food.ordering.system: DEBUG
-    liquibase: DEBUG
+    org.flywaydb: DEBUG
+    org.springframework.kafka: ERROR
+    org.apache.kafka: ERROR
+    org.apache.kafka.clients.consumer: ERROR
+    org.apache.kafka.clients.producer: ERROR
 
 order-service:
   payment-request-topic-name: payment-request
   payment-response-topic-name: payment-response
   restaurant-approval-request-topic-name: restaurant-approval-request
   restaurant-approval-response-topic-name: restaurant-approval-response
+  outbox-scheduler-fixed-rate: 10000
+  outbox-scheduler-initial-delay: 10000
+archive:
+  jdbc-batch-size: 30
 
 spring:
   jpa:
@@ -19,16 +27,22 @@ spring:
       ddl-auto: none
     open-in-view: false
     show-sql: true
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        format_sql: true
+        highlight_sql: true
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/postgres?currentSchema=order&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
     password: ${SPRING_DATASOURCE_PASSWORD:admin}
     driver-class-name: org.postgresql.Driver
-  liquibase:
+  flyway:
     enabled: true
-    liquibase-schema: public
-    change-log: classpath:db/changelog/db.changelog-master.yaml
+    locations: classpath:db/migration
+    schemas: order
+    default-schema: order_flyway
+    baseline-on-migrate: false
+    table: flyway_schema_history
 
 kafka-config:
   bootstrap-servers: localhost:29092, localhost:39092, localhost:49092
@@ -52,7 +66,9 @@ kafka-consumer-config:
   key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
   value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
   payment-response-consumer-group-id: payment-response-consumer
+  payment-response-dlt-consumer-group-id: payment-response-dlt-consumer
   restaurant-approval-response-consumer-group-id: restaurant-approval-response-consumer
+  restaurant-approval-response-dlt-consumer-group-id: restaurant-approval-response-dlt-consumer
   auto-offset-reset: earliest
   specific-avro-reader-key: specific.avro.reader
   specific-avro-reader: true
@@ -66,3 +82,6 @@ kafka-consumer-config:
   max-partition-fetch-bytes-default: 1048576
   max-partition-fetch-bytes-boost-factor: 1
   poll-timeout-ms: 150
+  retry-interval-ms: 2000
+  retry-max-attempts: 3
+  dlt-suffix: .DLT

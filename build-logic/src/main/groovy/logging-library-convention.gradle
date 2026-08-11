@@ -3,5 +3,7 @@ def libs = project.extensions.getByType(VersionCatalogsExtension).named("libs")
 dependencies {
     compileOnly libs.findLibrary("lombok").get().get()
     annotationProcessor libs.findLibrary("lombok").get().get()
+    testCompileOnly libs.findLibrary("lombok").get().get()
+    testAnnotationProcessor libs.findLibrary("lombok").get().get()
     implementation libs.findLibrary("spring-boot-starter-logging").get().get()
 }

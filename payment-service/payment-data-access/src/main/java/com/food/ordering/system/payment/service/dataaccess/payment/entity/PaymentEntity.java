@@ -7,6 +7,8 @@ import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Getter
 @Setter
@@ -22,6 +24,7 @@ public class PaymentEntity {
   private UUID orderId;
   private BigDecimal price;
 
+  @JdbcTypeCode(SqlTypes.NAMED_ENUM)
   @Enumerated(EnumType.STRING)
   private PaymentStatus status;
 

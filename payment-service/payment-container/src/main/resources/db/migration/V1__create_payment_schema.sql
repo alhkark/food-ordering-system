@@ -2,7 +2,7 @@ CREATE SCHEMA IF NOT EXISTS payment;
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
-CREATE TYPE payment_status AS ENUM ('COMPLETED', 'CANCELLED', 'FAILED');
+CREATE TYPE payment.payment_status AS ENUM ('COMPLETED', 'CANCELLED', 'FAILED');
 
 CREATE TABLE payment.payments
 (
@@ -23,7 +23,7 @@ CREATE TABLE payment.credit_entry
     CONSTRAINT credit_entry_pkey PRIMARY KEY (id)
 );
 
-CREATE TYPE transaction_type AS ENUM ('DEBIT', 'CREDIT');
+CREATE TYPE payment.transaction_type AS ENUM ('DEBIT', 'CREDIT');
 
 CREATE TABLE payment.credit_history
 (

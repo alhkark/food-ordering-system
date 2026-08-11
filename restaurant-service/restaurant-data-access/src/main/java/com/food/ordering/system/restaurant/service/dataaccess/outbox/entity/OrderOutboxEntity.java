@@ -1,0 +1,52 @@
+package com.food.ordering.system.restaurant.service.dataaccess.outbox.entity;
+
+import com.food.ordering.system.domain.valueobject.OrderApprovalStatus;
+import com.food.ordering.system.outbox.OutboxStatus;
+import jakarta.persistence.*;
+import java.time.ZonedDateTime;
+import java.util.UUID;
+import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "order_outbox")
+@Entity
+public class OrderOutboxEntity {
+
+  @Id private UUID id;
+  private UUID sagaId;
+  private ZonedDateTime createdAt;
+  private ZonedDateTime processedAt;
+  private String type;
+
+  @JdbcTypeCode(SqlTypes.JSON)
+  @Column(columnDefinition = "jsonb")
+  private String payload;
+
+  @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+  @Enumerated(EnumType.STRING)
+  private OutboxStatus outboxStatus;
+
+  @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+  @Enumerated(EnumType.STRING)
+  private OrderApprovalStatus approvalStatus;
+
+  @Version private int version;
+
+  @Override
+  public final boolean equals(Object o) {
+    if (!(o instanceof OrderOutboxEntity that)) return false;
+
+    return id.equals(that.id);
+  }
+
+  @Override
+  public int hashCode() {
+    return id.hashCode();
+  }
+}

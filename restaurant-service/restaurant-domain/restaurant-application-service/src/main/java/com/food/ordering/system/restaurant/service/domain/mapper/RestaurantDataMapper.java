@@ -5,6 +5,8 @@ import com.food.ordering.system.restaurant.service.domain.dto.RestaurantApproval
 import com.food.ordering.system.restaurant.service.domain.entity.OrderDetail;
 import com.food.ordering.system.restaurant.service.domain.entity.Product;
 import com.food.ordering.system.restaurant.service.domain.entity.Restaurant;
+import com.food.ordering.system.restaurant.service.domain.event.OrderApprovalEvent;
+import com.food.ordering.system.restaurant.service.domain.outbox.model.OrderEventPayload;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -14,7 +16,7 @@ public interface RestaurantDataMapper {
 
   @Mapping(target = "orderApproval", ignore = true)
   @Mapping(target = "active", ignore = true)
-  @Mapping(source = ".", target = "orderDetail")
+  @Mapping(source = "restaurantApprovalRequest", target = "orderDetail")
   Restaurant toRestaurant(RestaurantApprovalRequest restaurantApprovalRequest);
 
   @Mapping(source = "orderId", target = "orderId")
@@ -29,4 +31,14 @@ public interface RestaurantDataMapper {
   @Mapping(target = "price", ignore = true)
   @Mapping(target = "available", ignore = true)
   Product toProduct(Product product);
+
+  default OrderEventPayload toOrderEventPayload(OrderApprovalEvent orderApprovalEvent) {
+    return OrderEventPayload.builder()
+        .orderId(orderApprovalEvent.orderApproval().getOrderId().value().toString())
+        .restaurantId(orderApprovalEvent.restaurantId().value().toString())
+        .orderApprovalStatus(orderApprovalEvent.orderApproval().getApprovalStatus().name())
+        .createdAt(orderApprovalEvent.createdAt())
+        .failureMessages(orderApprovalEvent.failureMessages())
+        .build();
+  }
 }
