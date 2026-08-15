@@ -2,7 +2,9 @@ package com.food.ordering.system.order.service.domain.mapper;
 
 import com.food.ordering.system.mapper.UtilsMapperCommon;
 import com.food.ordering.system.order.service.domain.dto.create.CreateOrderResponse;
+import com.food.ordering.system.order.service.domain.dto.message.CustomerModel;
 import com.food.ordering.system.order.service.domain.dto.track.TrackOrderResponse;
+import com.food.ordering.system.order.service.domain.entity.Customer;
 import com.food.ordering.system.order.service.domain.entity.Order;
 import com.food.ordering.system.order.service.domain.entity.OrderItem;
 import com.food.ordering.system.order.service.domain.event.OrderCancelledEvent;
@@ -55,4 +57,6 @@ public interface OrderMapper {
 
   @Mapping(source = "product.id.value", target = "id")
   OrderApprovalEventProduct toOrderApprovalEventProduct(OrderItem orderItem);
+
+  Customer toCustomer(CustomerModel customerModel);
 }

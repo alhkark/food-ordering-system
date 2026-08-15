@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -19,5 +20,12 @@ public class CustomerRepositoryImpl implements CustomerRepository {
   @Override
   public Optional<Customer> findCustomer(UUID customerId) {
     return customerJpaRepository.findById(customerId).map(customerDataAccessMapper::toCustomer);
+  }
+
+  @Transactional
+  @Override
+  public Customer save(Customer customer) {
+    return customerDataAccessMapper.toCustomer(
+        customerJpaRepository.save(customerDataAccessMapper.toCustomerEntity(customer)));
   }
 }

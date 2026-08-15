@@ -1,0 +1,21 @@
+plugins {
+    id 'common-library-convention'
+    id 'logging-library-convention'
+    id 'spring-library-convention'
+}
+
+tasks.bootJar {
+    enabled = false
+}
+
+dependencies {
+    implementation project(':common:common-domain')
+    implementation project(':customer-service:customer-domain:customer-domain-core')
+    implementation project(':common:common-mapper')
+
+    implementation 'org.springframework:spring-tx'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    implementation libs.mapstruct
+    annotationProcessor libs.mapstruct.processor
+}

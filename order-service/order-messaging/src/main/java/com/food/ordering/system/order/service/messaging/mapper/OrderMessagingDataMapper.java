@@ -2,6 +2,7 @@ package com.food.ordering.system.order.service.messaging.mapper;
 
 import com.food.ordering.system.kafka.order.avro.model.*;
 import com.food.ordering.system.mapper.UtilsMapperCommon;
+import com.food.ordering.system.order.service.domain.dto.message.CustomerModel;
 import com.food.ordering.system.order.service.domain.dto.message.PaymentResponse;
 import com.food.ordering.system.order.service.domain.dto.message.RestaurantApprovalResponse;
 import com.food.ordering.system.order.service.domain.entity.OrderItem;
@@ -36,4 +37,6 @@ public interface OrderMessagingDataMapper {
   @Mapping(target = "sagaId", source = "sagaId")
   RestaurantApprovalRequestAvroModel toRestaurantApprovalRequestAvroModel(
       OrderApprovalEventPayload orderApprovalEventPayload, String sagaId);
+
+  CustomerModel toCustomerModel(CustomerAvroModel customerAvroModel);
 }

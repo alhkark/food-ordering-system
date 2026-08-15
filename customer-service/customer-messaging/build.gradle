@@ -1,0 +1,22 @@
+plugins {
+    id 'common-library-convention'
+    id 'logging-library-convention'
+    id 'spring-library-convention'
+}
+
+tasks.bootJar {
+    enabled = false
+}
+
+dependencies {
+    implementation project(':customer-service:customer-domain:customer-application-service')
+    implementation project(':infrastructure:kafka:kafka-model')
+    implementation project(':infrastructure:kafka:kafka-producer')
+    implementation project(':customer-service:customer-domain:customer-domain-core')
+    implementation project(':common:common-domain')
+
+    implementation libs.mapstruct
+    annotationProcessor libs.mapstruct.processor
+
+    implementation 'org.springframework.kafka:spring-kafka'
+}

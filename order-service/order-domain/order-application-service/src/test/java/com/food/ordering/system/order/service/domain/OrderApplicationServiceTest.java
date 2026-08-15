@@ -113,8 +113,7 @@ public class OrderApplicationServiceTest extends BaseTest {
             .address(orderAddress)
             .build();
 
-    customer = new Customer();
-    customer.setId(new CustomerId(CUSTOMER_ID));
+    customer = new Customer(new CustomerId(CUSTOMER_ID));
 
     restaurantResponse =
         Restaurant.builder()

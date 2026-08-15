@@ -1,0 +1,8 @@
+plugins {
+    id 'common-library-convention'
+    id 'logging-library-convention'
+}
+
+dependencies {
+    implementation project(':common:common-domain')
+}

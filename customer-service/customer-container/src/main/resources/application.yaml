@@ -1,0 +1,56 @@
+server:
+  port: 8184
+
+customer-service:
+  customer-topic-name: customer
+
+spring:
+  jpa:
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        highlight_sql: true
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/postgres?currentSchema=customer&=true&reWriteBatchedInserts=true&stringtype=unspecified}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:admin}
+    driver-class-name: org.postgresql.Driver
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    schemas: customer
+    default-schema: flyway_customer
+    baseline-on-migrate: false
+    table: flyway_schema_history
+
+logging:
+  level:
+    com.food.ordering.system: DEBUG
+    org.flywaydb: DEBUG
+    org.springframework.kafka: ERROR
+    org.apache.kafka: ERROR
+    org.apache.kafka.clients.consumer: ERROR
+    org.apache.kafka.clients.producer: ERROR
+
+kafka-config:
+  bootstrap-servers: localhost:29092, localhost:39092, localhost:49092
+  schema-registry-url-key: schema.registry.url
+  schema-registry-url: http://localhost:8081
+  num-of-partitions: 3
+  replication-factor: 3
+
+kafka-producer-config:
+  key-serializer-class: org.apache.kafka.common.serialization.StringSerializer
+  value-serializer-class: io.confluent.kafka.serializers.KafkaAvroSerializer
+  compression-type: snappy
+  acks: all
+  batch-size: 16384
+  batch-size-boost-factor: 100
+  linger-ms: 5
+  request-timeout-ms: 60000
+  retry-count: 5

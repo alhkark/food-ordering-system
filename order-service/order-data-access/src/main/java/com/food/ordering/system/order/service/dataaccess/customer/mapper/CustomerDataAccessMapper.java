@@ -5,6 +5,7 @@ import com.food.ordering.system.order.service.dataaccess.customer.entity.Custome
 import com.food.ordering.system.order.service.domain.entity.Customer;
 import com.food.ordering.system.order.service.domain.mapper.UtilsMapper;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 @Mapper(
     componentModel = "spring",
@@ -12,4 +13,7 @@ import org.mapstruct.Mapper;
 public interface CustomerDataAccessMapper {
 
   Customer toCustomer(CustomerEntity customerEntity);
+
+  @Mapping(source = "id.value", target = "id")
+  CustomerEntity toCustomerEntity(Customer customer);
 }

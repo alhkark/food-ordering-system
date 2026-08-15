@@ -1,0 +1,27 @@
+plugins {
+    id 'common-library-convention'
+    id 'logging-library-convention'
+    id 'spring-library-convention'
+    id 'test-container-convention'
+}
+
+dependencies {
+    implementation project(':customer-service:customer-domain:customer-domain-core')
+    implementation project(':customer-service:customer-domain:customer-application-service')
+    implementation project(':customer-service:customer-data-access')
+    implementation project(':customer-service:customer-messaging')
+    implementation project(':customer-service:customer-application')
+
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.postgresql:postgresql'
+    implementation 'org.springframework.boot:spring-boot-starter-flyway'
+    implementation libs.flyway.postgres
+
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+    testImplementation 'org.testcontainers:postgresql'
+}
+
+bootBuildImage {
+    imageName = "${project.group}/customer.service:${project.version}"
+//    environment = ["BP_JVM_VERSION": "21", "BP_JVM_HEAD_ROOM": "0"]
+}
