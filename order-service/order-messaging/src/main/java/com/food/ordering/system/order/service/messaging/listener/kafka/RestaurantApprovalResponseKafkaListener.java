@@ -2,7 +2,6 @@ package com.food.ordering.system.order.service.messaging.listener.kafka;
 
 import com.food.ordering.system.kafka.consumer.KafkaConsumer;
 import com.food.ordering.system.kafka.order.avro.model.OrderApprovalStatus;
-import com.food.ordering.system.kafka.order.avro.model.PaymentResponseAvroModel;
 import com.food.ordering.system.kafka.order.avro.model.RestaurantApprovalResponseAvroModel;
 import com.food.ordering.system.order.service.domain.exception.OrderNotFoundException;
 import com.food.ordering.system.order.service.domain.ports.input.message.listener.restaurantapproval.RestaurantApprovalResponseMessageListener;
@@ -82,8 +81,9 @@ public class RestaurantApprovalResponseKafkaListener
       topics = "${order-service.restaurant-approval-response-topic-name}.DLT",
       groupId = "${kafka-consumer-config.restaurant-approval-response-dlt-consumer-group-id}")
   public void handleDlt(
-      @Payload PaymentResponseAvroModel message,
-      @Header(KafkaHeaders.EXCEPTION_MESSAGE) String errorMessage) {
-    log.error("Poison message in DLT: orderId={}, error={}", message.getOrderId(), errorMessage);
+      @Payload List<byte[]> messages,
+      @Header(KafkaHeaders.RECEIVED_TOPIC) List<String> topics,
+      @Header(name = KafkaHeaders.EXCEPTION_MESSAGE, required = false) List<String> errors) {
+    log.error("Poison DLT batch size={}, errors={}", messages.size(), errors);
   }
 }

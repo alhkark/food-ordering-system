@@ -95,9 +95,13 @@ public class KafkaConsumerConfig<K extends Serializable, V extends SpecificRecor
     DeadLetterPublishingRecoverer recoverer =
         new DeadLetterPublishingRecoverer(
             kafkaTemplate,
-            (record, ex) ->
-                new TopicPartition(
-                    record.topic() + kafkaConsumerConfigData.getDltSuffix(), record.partition()));
+            (record, ex) -> {
+              if (record.topic().endsWith(kafkaConsumerConfigData.getDltSuffix())) {
+                return null;
+              }
+              return new TopicPartition(
+                  record.topic() + kafkaConsumerConfigData.getDltSuffix(), -1);
+            });
     DefaultErrorHandler errorHandler = new DefaultErrorHandler(recoverer, backOff);
     errorHandler.addNotRetryableExceptions(
         IllegalArgumentException.class,

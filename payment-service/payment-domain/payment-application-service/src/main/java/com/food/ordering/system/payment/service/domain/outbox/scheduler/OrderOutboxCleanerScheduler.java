@@ -21,7 +21,7 @@ public class OrderOutboxCleanerScheduler implements OutboxScheduler {
 
   @Override
   @Transactional
-  @Scheduled(cron = "@midnight")
+  @Scheduled(cron = "${payment-service.outbox-cleaner-scheduler:@midnight}")
   public void processOutboxMessage() {
     List<OrderOutboxMessage> outboxMessages =
         orderOutboxHelper.getOrderOutboxMessageByOutboxStatus(OutboxStatus.COMPLETED);

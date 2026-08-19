@@ -11,6 +11,13 @@
       }
     },
     {
+       "name": "customerId",
+        "type": {
+          "type": "string",
+          "logicalType": "uuid"
+        }
+    },
+    {
       "name": "username",
       "type": {
         "type": "string"

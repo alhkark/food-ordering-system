@@ -18,7 +18,7 @@ public class OrderOutboxCleanerScheduler implements OutboxScheduler {
   private final OrderOutboxHelper orderOutboxHelper;
 
   @Transactional
-  @Scheduled(cron = "@midnight")
+  @Scheduled(cron = "${restaurant-service.outbox-cleaner-scheduler:@midnight}")
   @Override
   public void processOutboxMessage() {
     List<OrderOutboxMessage> outboxMessages =

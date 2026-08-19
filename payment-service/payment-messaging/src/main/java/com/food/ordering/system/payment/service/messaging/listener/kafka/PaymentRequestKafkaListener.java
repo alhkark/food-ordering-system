@@ -87,8 +87,9 @@ public class PaymentRequestKafkaListener implements KafkaConsumer<PaymentRequest
       topics = "${payment-service.payment-request-topic-name}.DLT",
       groupId = "${kafka-consumer-config.payment-request-dlt-consumer-group-id}")
   public void handleDlt(
-      @Payload PaymentRequestAvroModel message,
-      @Header(KafkaHeaders.EXCEPTION_MESSAGE) String errorMessage) {
-    log.error("Poison message in DLT: orderId={}, error={}", message.getOrderId(), errorMessage);
+      @Payload List<byte[]> messages,
+      @Header(KafkaHeaders.RECEIVED_TOPIC) List<String> topics,
+      @Header(name = KafkaHeaders.EXCEPTION_MESSAGE, required = false) List<String> errors) {
+    log.error("Poison DLT batch size={}, errors={}", messages.size(), errors);
   }
 }

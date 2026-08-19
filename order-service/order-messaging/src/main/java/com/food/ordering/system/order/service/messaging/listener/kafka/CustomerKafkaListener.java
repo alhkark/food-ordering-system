@@ -42,4 +42,15 @@ public class CustomerKafkaListener implements KafkaConsumer<CustomerAvroModel> {
             customerMessageListener.customerCreated(
                 orderMessagingDataMapper.toCustomerModel(customerAvroModel)));
   }
+
+  @KafkaListener(
+      id = "customer-listener-dlt",
+      topics = "${order-service.customer-topic-name}.DLT",
+      groupId = "${kafka-consumer-config.customer-group-dlt-id}")
+  public void handleDlt(
+      @Payload List<byte[]> messages,
+      @Header(KafkaHeaders.RECEIVED_TOPIC) List<String> topics,
+      @Header(name = KafkaHeaders.EXCEPTION_MESSAGE, required = false) List<String> errors) {
+    log.error("Poison DLT batch size={}, errors={}", messages.size(), errors);
+  }
 }

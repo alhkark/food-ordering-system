@@ -38,5 +38,6 @@ public interface OrderMessagingDataMapper {
   RestaurantApprovalRequestAvroModel toRestaurantApprovalRequestAvroModel(
       OrderApprovalEventPayload orderApprovalEventPayload, String sagaId);
 
+  @Mapping(source = "customerId", target = "id")
   CustomerModel toCustomerModel(CustomerAvroModel customerAvroModel);
 }

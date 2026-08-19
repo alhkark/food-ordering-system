@@ -1,11 +1,11 @@
 package com.food.ordering.system.customer.service.domain;
 
 import com.food.ordering.system.customer.service.domain.create.CreateCustomerCommand;
-import com.food.ordering.system.customer.service.domain.entity.Customer;
+import com.food.ordering.system.customer.service.domain.create.CreateCustomerResponse;
 import com.food.ordering.system.customer.service.domain.event.CustomerCreatedEvent;
-import com.food.ordering.system.customer.service.domain.exception.CustomerDomainException;
 import com.food.ordering.system.customer.service.domain.mapper.CustomerDataMapper;
-import com.food.ordering.system.customer.service.domain.ports.output.repository.CustomerRepository;
+import com.food.ordering.system.customer.service.domain.outbox.scheduler.CustomerOutboxHelper;
+import com.food.ordering.system.outbox.OutboxStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -16,25 +16,27 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 class CustomerCreateCommandHandler {
 
-  private final CustomerDomainService customerDomainService;
-
-  private final CustomerRepository customerRepository;
-
   private final CustomerDataMapper customerDataMapper;
 
+  private final CustomerCreateHelper customerCreateHelper;
+
+  private final CustomerOutboxHelper customerOutboxHelper;
+
   @Transactional
-  public CustomerCreatedEvent createCustomer(CreateCustomerCommand createCustomerCommand) {
-    Customer customer = customerDataMapper.toCustomer(createCustomerCommand);
+  public CreateCustomerResponse createCustomer(CreateCustomerCommand createCustomerCommand) {
     CustomerCreatedEvent customerCreatedEvent =
-        customerDomainService.validateAndInitiateCustomer(customer);
-    Customer savedCustomer = customerRepository.createCustomer(customer);
-    if (savedCustomer == null) {
-      log.error("Could not save customer with id: {}", createCustomerCommand.customerId());
-      throw new CustomerDomainException(
-          "Could not save customer with id " + createCustomerCommand.customerId());
-    }
+        customerCreateHelper.persistCustomer(createCustomerCommand);
+    CreateCustomerResponse createCustomerResponse =
+        customerDataMapper.toCreateCustomerResponse(
+            customerCreatedEvent.customer(), "Customer created successfully!");
+
+    customerOutboxHelper.saveCustomerOutboxMessage(
+        customerDataMapper.toCustomerEventPayload(customerCreatedEvent),
+        OutboxStatus.STARTED,
+        customerCreatedEvent.createdAt());
+
     log.info(
-        "Returning CustomerCreatedEvent for customer id: {}", createCustomerCommand.customerId());
-    return customerCreatedEvent;
+        "Returning CreateCustomerResponse for customer id: {}", createCustomerCommand.customerId());
+    return createCustomerResponse;
   }
 }

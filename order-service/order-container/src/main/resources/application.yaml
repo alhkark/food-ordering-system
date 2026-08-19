@@ -27,7 +27,7 @@ spring:
     hibernate:
       ddl-auto: none
     open-in-view: false
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
@@ -71,6 +71,7 @@ kafka-consumer-config:
   restaurant-approval-response-consumer-group-id: restaurant-approval-response-consumer
   restaurant-approval-response-dlt-consumer-group-id: restaurant-approval-response-dlt-consumer
   customer-group-id: customer-topic-consumer
+  customer-group-dlt-id: customer-topic-dlt-consumer
   auto-offset-reset: earliest
   specific-avro-reader-key: specific.avro.reader
   specific-avro-reader: true

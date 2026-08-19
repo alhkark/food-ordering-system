@@ -3,6 +3,8 @@ package com.food.ordering.system.customer.service.domain.mapper;
 import com.food.ordering.system.customer.service.domain.create.CreateCustomerCommand;
 import com.food.ordering.system.customer.service.domain.create.CreateCustomerResponse;
 import com.food.ordering.system.customer.service.domain.entity.Customer;
+import com.food.ordering.system.customer.service.domain.event.CustomerCreatedEvent;
+import com.food.ordering.system.customer.service.domain.outbox.model.CustomerEventPayload;
 import com.food.ordering.system.mapper.UtilsMapperCommon;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -15,4 +17,10 @@ public interface CustomerDataMapper {
 
   @Mapping(source = "customer.id.value", target = "customerId")
   CreateCustomerResponse toCreateCustomerResponse(Customer customer, String message);
+
+  @Mapping(source = "customer.id.value", target = "customerId")
+  @Mapping(source = "customer.username", target = "username")
+  @Mapping(source = "customer.firstName", target = "firstName")
+  @Mapping(source = "customer.lastName", target = "lastName")
+  CustomerEventPayload toCustomerEventPayload(CustomerCreatedEvent customerCreatedEvent);
 }
