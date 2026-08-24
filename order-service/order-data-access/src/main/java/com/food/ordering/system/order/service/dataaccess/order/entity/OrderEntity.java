@@ -1,5 +1,6 @@
 package com.food.ordering.system.order.service.dataaccess.order.entity;
 
+import com.food.ordering.system.domain.valueobject.OrderPreferences;
 import com.food.ordering.system.domain.valueobject.OrderStatus;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
@@ -27,6 +28,10 @@ public class OrderEntity {
   @JdbcTypeCode(SqlTypes.NAMED_ENUM)
   @Enumerated(EnumType.STRING)
   private OrderStatus orderStatus;
+
+  @JdbcTypeCode(SqlTypes.JSON)
+  // @Column(name = "order_preferences")
+  private OrderPreferences orderPreferences;
 
   private String failureMessages;
 

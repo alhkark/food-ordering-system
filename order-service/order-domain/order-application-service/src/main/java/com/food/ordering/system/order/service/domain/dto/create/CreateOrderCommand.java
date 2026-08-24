@@ -12,4 +12,5 @@ public record CreateOrderCommand(
     @NotNull UUID restaurantId,
     @NotNull BigDecimal price,
     @NotNull List<OrderItem> items,
-    @NotNull OrderAddress address) {}
+    @NotNull OrderAddress address,
+    String orderNotes) {}

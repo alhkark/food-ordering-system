@@ -51,6 +51,8 @@ public class OrderApplicationServiceTest extends BaseTest {
   CreateOrderCommand createOrderCommandWrongProductPrice;
   Customer customer;
   Restaurant restaurantResponse;
+  String orderNotes;
+  OrderPreferences orderPreferences;
   final UUID CUSTOMER_ID = UUID.fromString("b134c0f3-2c55-4e21-9834-af684f87d4de");
   final UUID RESTAURANT_ID = UUID.fromString("6e446872-bbeb-43f4-8915-6f5ac60f80c0");
   final UUID PRODUCT_ID = UUID.fromString("c3304d12-2f65-4948-baed-1c871bb7025e");
@@ -60,6 +62,7 @@ public class OrderApplicationServiceTest extends BaseTest {
 
   @BeforeAll
   public void init() {
+    orderNotes = "no onions pls, with pickles, extra spicy but not too spicy. Leave at the door!";
     var orderAddress = new OrderAddress("street 1", "12345", "London");
     var orderItem_1 =
         new OrderItem(PRODUCT_ID, 1, new BigDecimal("50.00"), new BigDecimal("50.00"));
@@ -67,7 +70,12 @@ public class OrderApplicationServiceTest extends BaseTest {
         new OrderItem(PRODUCT_ID, 3, new BigDecimal("50.00"), new BigDecimal("150.00"));
     createOrderCommand =
         new CreateOrderCommand(
-            CUSTOMER_ID, RESTAURANT_ID, PRICE, List.of(orderItem_1, orderItem_2), orderAddress);
+            CUSTOMER_ID,
+            RESTAURANT_ID,
+            PRICE,
+            List.of(orderItem_1, orderItem_2),
+            orderAddress,
+            orderNotes);
 
     createOrderCommandWrongPrice =
         CreateOrderCommand.builder()
@@ -129,8 +137,13 @@ public class OrderApplicationServiceTest extends BaseTest {
             .active(true)
             .build();
 
-    var order = createOrderCommandMapper.toOrder(createOrderCommand);
-    order.setId(new OrderId(ORDER_ID));
+    orderPreferences =
+        OrderPreferences.builder()
+            .addIngredients(List.of("pickle"))
+            .removeIngredients(List.of("onion"))
+            .spiceLevel(SpiceLevel.MEDIUM)
+            .deliveryInstructions("Leave at the door!")
+            .build();
   }
 
   @BeforeEach
@@ -148,6 +161,7 @@ public class OrderApplicationServiceTest extends BaseTest {
             });
     when(paymentOutboxRepository.save(any(OrderPaymentOutboxMessage.class)))
         .thenReturn(getOrderPaymentOutboxMessage());
+    when(orderNoteInterpreter.interpret(orderNotes)).thenReturn(orderPreferences);
   }
 
   @Test

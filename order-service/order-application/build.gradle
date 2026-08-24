@@ -10,6 +10,7 @@ tasks.bootJar {
 
 dependencies {
     implementation project(':order-service:order-domain:order-application-service')
+    implementation project(':order-service:order-ai')
     implementation project(':common:common-application')
 
     implementation 'org.springframework.boot:spring-boot-starter-web'

@@ -1,0 +1,16 @@
+plugins {
+    id 'common-library-convention'
+    id 'logging-library-convention'
+    id 'spring-library-convention'
+}
+
+tasks.bootJar {
+    enabled = false
+}
+
+dependencies {
+    implementation project(':order-service:order-domain:order-application-service')
+
+    implementation platform(libs.spring.ai.bom)
+    implementation libs.spring.ai.ollama
+}

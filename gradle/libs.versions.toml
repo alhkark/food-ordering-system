@@ -12,6 +12,7 @@ apache-avro="1.12.1"
 apache-avro-gradle-plugin="1.2.0"
 test-container-bom="1.21.4"
 flyway-postgres="12.8.1"
+spring-ai="2.0.0"
 
 [libraries]
 #plugins
@@ -22,14 +23,18 @@ spring-dependency-management-plugin-gradle = { module = "io.spring.gradle:depend
 #dependencies
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 spring-boot-starter-logging = { module = "org.springframework.boot:spring-boot-starter-logging", version.ref = "spring-boot" }
-junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "mapstruct" }
 mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "mapstruct" }
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
 kafka-avro-ser = { module = "io.confluent:kafka-avro-serializer", version.ref = "confluent" }
 apache-avro = { module = "org.apache.avro:avro", version.ref = "apache-avro" }
-test-container-bom = { module = "org.testcontainers:testcontainers-bom", version.ref = "test-container-bom" }
 flyway-postgres = { module = "org.flywaydb:flyway-database-postgresql", version.ref = "flyway-postgres"}
+spring-ai-ollama = { module = "org.springframework.ai:spring-ai-starter-model-ollama"}
+
+#bom
+spring-ai-bom = { module = "org.springframework.ai:spring-ai-bom", version.ref = "spring-ai"}
+test-container-bom = { module = "org.testcontainers:testcontainers-bom", version.ref = "test-container-bom" }
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }

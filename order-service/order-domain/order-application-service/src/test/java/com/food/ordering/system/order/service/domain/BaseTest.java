@@ -1,5 +1,6 @@
 package com.food.ordering.system.order.service.domain;
 
+import com.food.ordering.system.order.service.domain.ports.output.ai.order.noteinterpreter.OrderNoteInterpreter;
 import com.food.ordering.system.order.service.domain.ports.output.message.publisher.payment.PaymentRequestMessagePublisher;
 import com.food.ordering.system.order.service.domain.ports.output.message.publisher.restaurantapproval.RestaurantApprovalRequestMessagePublisher;
 import com.food.ordering.system.order.service.domain.ports.output.repository.*;
@@ -26,4 +27,6 @@ public class BaseTest {
   @MockitoBean ArchivePaymentOutboxRepository archivePaymentOutboxRepository;
 
   @MockitoBean ArchiveApprovalOutboxRepository archiveApprovalOutboxRepository;
+
+  @MockitoBean OrderNoteInterpreter orderNoteInterpreter;
 }

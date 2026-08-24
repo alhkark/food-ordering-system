@@ -9,6 +9,7 @@ logging:
     org.apache.kafka: ERROR
     org.apache.kafka.clients.consumer: ERROR
     org.apache.kafka.clients.producer: ERROR
+    org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor: DEBUG
 
 order-service:
   payment-request-topic-name: payment-request
@@ -44,6 +45,22 @@ spring:
     default-schema: order_flyway
     baseline-on-migrate: false
     table: flyway_schema_history
+  ai:
+    retry:
+      max-attempts: 1
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        options:
+          model: mistral:7b
+          max-new-tokens: 512
+          temperature: 0.7
+
+order:
+  ai:
+    provider: ollama
+    interpreter:
+      max-attempts: 3
 
 kafka-config:
   bootstrap-servers: localhost:29092, localhost:39092, localhost:49092
