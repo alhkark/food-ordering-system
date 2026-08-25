@@ -4,10 +4,6 @@ plugins {
     id 'spring-library-convention'
 }
 
-tasks.bootJar {
-    enabled = false
-}
-
 dependencies {
     implementation project(':common:common-domain')
 

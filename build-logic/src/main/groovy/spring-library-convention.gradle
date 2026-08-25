@@ -3,6 +3,18 @@ plugins {
     id 'io.spring.dependency-management'
 }
 
+tasks.named('bootJar') {
+    enabled = false
+}
+
+tasks.named('bootBuildImage') {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

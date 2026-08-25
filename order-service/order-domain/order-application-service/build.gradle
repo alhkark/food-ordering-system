@@ -4,10 +4,6 @@ plugins {
     id 'spring-library-convention'
 }
 
-tasks.bootJar {
-    enabled = false
-}
-
 dependencies {
     api project(':order-service:order-domain:order-domain-core')
     api project(':common:common-domain')

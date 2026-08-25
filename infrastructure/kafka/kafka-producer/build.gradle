@@ -4,10 +4,6 @@ plugins {
     id 'apache-avro-library-convention'
 }
 
-tasks.bootJar {
-    enabled = false
-}
-
 dependencies {
     implementation project(':infrastructure:kafka:kafka-model')
     implementation project(':infrastructure:kafka:kafka-config-data')

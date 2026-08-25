@@ -27,6 +27,7 @@ public interface CreateOrderCommandMapper {
   @Mapping(target = "trackingId", ignore = true)
   @Mapping(target = "orderStatus", ignore = true)
   @Mapping(target = "failureMessages", ignore = true)
+  @Mapping(target = "orderPreferences", ignore = true)
   Order toOrder(CreateOrderCommand createOrderCommand);
 
   @Mapping(target = "id", expression = "java(java.util.UUID.randomUUID())")

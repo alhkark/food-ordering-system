@@ -5,10 +5,6 @@ plugins {
     id 'logging-library-convention'
 }
 
-tasks.bootJar {
-    enabled = false
-}
-
 dependencies {
     implementation project(':infrastructure:kafka:kafka-config-data')
     implementation project(':payment-service:payment-domain:payment-application-service')

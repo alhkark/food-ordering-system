@@ -4,10 +4,6 @@ plugins {
     id 'spring-library-convention'
 }
 
-tasks.bootJar {
-    enabled = false
-}
-
 dependencies {
     implementation project(':payment-service:payment-domain:payment-application-service')
     implementation project(':common:common-mapper')

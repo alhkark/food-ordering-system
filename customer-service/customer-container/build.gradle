@@ -21,7 +21,11 @@ dependencies {
     testImplementation 'org.testcontainers:postgresql'
 }
 
+tasks.named('bootJar') { enabled = true }
+tasks.named('jar') { enabled = false }
+
 bootBuildImage {
+    enabled = true
     imageName = "${project.group}/customer.service:${project.version}"
 //    environment = ["BP_JVM_VERSION": "21", "BP_JVM_HEAD_ROOM": "0"]
 }
