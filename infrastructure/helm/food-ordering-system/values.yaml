@@ -1,0 +1,65 @@
+order-service:
+  fullnameOverride: order-service
+  image:
+    repository: com.food.ordering.system/order.service
+    tag: "1.0-SNAPSHOT"
+    pullPolicy: IfNotPresent
+  service:
+    port: 8181
+  datasource:
+    url: jdbc:postgresql://postgres:5432/postgres?currentSchema=order&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
+    username: postgres
+    password: admin
+  kafka:
+    bootstrapServers: broker-1:19092,broker-2:19092,broker-3:19092
+    schemaRegistryUrl: http://schema-registry:8081
+  extraEnv:
+    SPRING_AI_OLLAMA_BASE_URL: http://ollama:11434
+
+payment-service:
+  fullnameOverride: payment-service
+  image:
+    repository: com.food.ordering.system/payment.service
+    tag: "1.0-SNAPSHOT"
+    pullPolicy: IfNotPresent
+  service:
+    port: 8182
+  datasource:
+    url: jdbc:postgresql://postgres:5432/postgres?currentSchema=payment&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
+    username: postgres
+    password: admin
+  kafka:
+    bootstrapServers: broker-1:19092,broker-2:19092,broker-3:19092
+    schemaRegistryUrl: http://schema-registry:8081
+
+restaurant-service:
+  fullnameOverride: restaurant-service
+  image:
+    repository: com.food.ordering.system/restaurant.service
+    tag: "1.0-SNAPSHOT"
+    pullPolicy: IfNotPresent
+  service:
+    port: 8183
+  datasource:
+    url: jdbc:postgresql://postgres:5432/postgres?currentSchema=restaurant&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
+    username: postgres
+    password: admin
+  kafka:
+    bootstrapServers: broker-1:19092,broker-2:19092,broker-3:19092
+    schemaRegistryUrl: http://schema-registry:8081
+
+customer-service:
+  fullnameOverride: customer-service
+  image:
+    repository: com.food.ordering.system/customer.service
+    tag: "1.0-SNAPSHOT"
+    pullPolicy: IfNotPresent
+  service:
+    port: 8184
+  datasource:
+    url: jdbc:postgresql://postgres:5432/postgres?currentSchema=customer&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
+    username: postgres
+    password: admin
+  kafka:
+    bootstrapServers: broker-1:19092,broker-2:19092,broker-3:19092
+    schemaRegistryUrl: http://schema-registry:8081

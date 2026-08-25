@@ -1,0 +1,7 @@
+{{ include "food-ordering-service.fullname" . }} is installed.
+
+Service DNS (this namespace):
+  {{ include "food-ordering-service.fullname" . }}:{{ .Values.service.port }}
+
+From another namespace:
+  {{ include "food-ordering-service.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.port }}

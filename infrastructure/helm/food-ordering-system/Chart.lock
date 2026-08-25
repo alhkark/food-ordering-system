@@ -1,0 +1,15 @@
+dependencies:
+- name: food-ordering-service
+  repository: file://../food-ordering-service
+  version: 1.0.0
+- name: food-ordering-service
+  repository: file://../food-ordering-service
+  version: 1.0.0
+- name: food-ordering-service
+  repository: file://../food-ordering-service
+  version: 1.0.0
+- name: food-ordering-service
+  repository: file://../food-ordering-service
+  version: 1.0.0
+digest: sha256:4c65566ace6ac1af9f3812ec6548aa75ce76262e9997facfc6093139966012cf
+generated: "2026-08-25T22:35:55.15069+03:00"

@@ -1,0 +1,23 @@
+Food ordering services are installed in namespace {{ .Release.Namespace }}.
+
+Cluster DNS (same namespace):
+  order-service:8181
+  payment-service:8182
+  restaurant-service:8183
+  customer-service:8184
+
+From another namespace:
+  order-service.{{ .Release.Namespace }}.svc.cluster.local:8181
+  payment-service.{{ .Release.Namespace }}.svc.cluster.local:8182
+  restaurant-service.{{ .Release.Namespace }}.svc.cluster.local:8183
+  customer-service.{{ .Release.Namespace }}.svc.cluster.local:8184
+
+Images must already exist locally (imagePullPolicy: IfNotPresent), for example:
+  ./gradlew :order-service:order-container:bootBuildImage
+  ./gradlew :payment-service:payment-container:bootBuildImage
+  ./gradlew :restaurant-service:restaurant-container:bootBuildImage
+  ./gradlew :customer-service:customer-container:bootBuildImage
+
+Postgres, Kafka, and Schema Registry are not part of this chart. Point
+datasource.url, kafka.bootstrapServers, and kafka.schemaRegistryUrl at
+Services in this cluster (same namespace: postgres, broker-1, schema-registry).
