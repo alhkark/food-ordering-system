@@ -12,6 +12,7 @@ dependencies {
     implementation project(':customer-service:customer-messaging')
     implementation project(':customer-service:customer-application')
 
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.postgresql:postgresql'
     implementation 'org.springframework.boot:spring-boot-starter-flyway'

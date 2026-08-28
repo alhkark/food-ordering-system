@@ -1,6 +1,19 @@
 server:
   port: 8184
 
+management:
+  server:
+    port: ${MANAGEMENT_SERVER_PORT:9090}
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
+
 customer-service:
   customer-topic-name: customer
   outbox-scheduler-fixed-rate: 10000

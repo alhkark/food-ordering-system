@@ -6,13 +6,13 @@ plugins {
 }
 
 dependencies {
-    implementation project(':infrastructure:kafka:kafka-config-data')
+    implementation project(':common:kafka:kafka-config-data')
     implementation project(':restaurant-service:restaurant-domain:restaurant-application-service')
-    implementation project(':infrastructure:kafka:kafka-consumer')
-    implementation project(':infrastructure:kafka:kafka-model')
-    implementation project(':infrastructure:kafka:kafka-producer')
+    implementation project(':common:kafka:kafka-consumer')
+    implementation project(':common:kafka:kafka-model')
+    implementation project(':common:kafka:kafka-producer')
     implementation project(':common:common-mapper')
-    implementation project(':infrastructure:outbox')
+    implementation project(':common:outbox')
     implementation 'org.springframework.kafka:spring-kafka'
     implementation 'org.postgresql:postgresql'
 

@@ -12,6 +12,27 @@ From another namespace:
   restaurant-service.{{ .Release.Namespace }}.svc.cluster.local:8183
   customer-service.{{ .Release.Namespace }}.svc.cluster.local:8184
 
+Check:
+  kubectl get pods,svc,ingress -n {{ .Release.Namespace }}
+
+{{- if .Values.ingress.enabled }}
+
+Ingress (path-only, any Host including IP):
+  /orders     -> order-service:{{ index .Values "order-service" "service" "port" }}
+  /customers  -> customer-service:{{ index .Values "customer-service" "service" "port" }}
+
+  curl http://$(minikube ip)/orders
+  curl http://$(minikube ip)/customers
+
+On Docker-driver minikube (macOS), use a tunnel then localhost:
+  minikube tunnel
+  curl http://127.0.0.1/orders
+  curl http://127.0.0.1/customers
+{{- end }}
+
+Port-forward (without Ingress):
+  kubectl port-forward -n {{ .Release.Namespace }} svc/order-service 8181:8181
+
 Images must already exist locally (imagePullPolicy: IfNotPresent), for example:
   ./gradlew :order-service:order-container:bootBuildImage
   ./gradlew :payment-service:payment-container:bootBuildImage

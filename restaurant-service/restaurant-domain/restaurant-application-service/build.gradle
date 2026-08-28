@@ -7,8 +7,8 @@ plugins {
 dependencies {
     api project(':restaurant-service:restaurant-domain:restaurant-domain-core')
     implementation project(':common:common-mapper')
-    implementation project(':infrastructure:saga')
-    implementation project(':infrastructure:outbox')
+    implementation project(':common:saga')
+    implementation project(':common:outbox')
 
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework:spring-tx'

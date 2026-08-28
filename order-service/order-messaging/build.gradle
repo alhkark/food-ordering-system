@@ -10,10 +10,10 @@ tasks.bootJar {
 }
 
 dependencies {
-    implementation project(':infrastructure:kafka:kafka-config-data')
-    implementation project(':infrastructure:kafka:kafka-consumer')
-    implementation project(':infrastructure:kafka:kafka-model')
-    implementation project(':infrastructure:kafka:kafka-producer')
+    implementation project(':common:kafka:kafka-config-data')
+    implementation project(':common:kafka:kafka-consumer')
+    implementation project(':common:kafka:kafka-model')
+    implementation project(':common:kafka:kafka-producer')
     implementation project(':order-service:order-domain:order-application-service')
     implementation project(':common:common-mapper')
     implementation 'org.springframework.kafka:spring-kafka'

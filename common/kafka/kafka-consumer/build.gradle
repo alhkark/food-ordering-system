@@ -5,7 +5,7 @@ plugins {
 }
 
 dependencies {
-    implementation project(':infrastructure:kafka:kafka-config-data')
+    implementation project(':common:kafka:kafka-config-data')
 
     implementation 'org.springframework.kafka:spring-kafka'
     compileOnly libs.lombok

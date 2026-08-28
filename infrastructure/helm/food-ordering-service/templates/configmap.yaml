@@ -7,6 +7,7 @@ metadata:
 data:
   SERVER_PORT: {{ .Values.service.port | quote }}
   PORT: {{ .Values.service.port | quote }}
+  MANAGEMENT_SERVER_PORT: {{ .Values.service.managementPort | quote }}
   SPRING_DATASOURCE_URL: {{ .Values.datasource.url | quote }}
   SPRING_DATASOURCE_USERNAME: {{ .Values.datasource.username | quote }}
   KAFKA_CONFIG_BOOTSTRAP_SERVERS: {{ .Values.kafka.bootstrapServers | quote }}

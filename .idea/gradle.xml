@@ -27,6 +27,13 @@
             <option value="$PROJECT_DIR$/common/common-data-access-archive" />
             <option value="$PROJECT_DIR$/common/common-domain" />
             <option value="$PROJECT_DIR$/common/common-mapper" />
+            <option value="$PROJECT_DIR$/common/kafka" />
+            <option value="$PROJECT_DIR$/common/kafka/kafka-config-data" />
+            <option value="$PROJECT_DIR$/common/kafka/kafka-consumer" />
+            <option value="$PROJECT_DIR$/common/kafka/kafka-model" />
+            <option value="$PROJECT_DIR$/common/kafka/kafka-producer" />
+            <option value="$PROJECT_DIR$/common/outbox" />
+            <option value="$PROJECT_DIR$/common/saga" />
             <option value="$PROJECT_DIR$/customer-service" />
             <option value="$PROJECT_DIR$/customer-service/customer-application" />
             <option value="$PROJECT_DIR$/customer-service/customer-container" />
@@ -36,13 +43,6 @@
             <option value="$PROJECT_DIR$/customer-service/customer-domain/customer-domain-core" />
             <option value="$PROJECT_DIR$/customer-service/customer-messaging" />
             <option value="$PROJECT_DIR$/infrastructure" />
-            <option value="$PROJECT_DIR$/infrastructure/kafka" />
-            <option value="$PROJECT_DIR$/infrastructure/kafka/kafka-config-data" />
-            <option value="$PROJECT_DIR$/infrastructure/kafka/kafka-consumer" />
-            <option value="$PROJECT_DIR$/infrastructure/kafka/kafka-model" />
-            <option value="$PROJECT_DIR$/infrastructure/kafka/kafka-producer" />
-            <option value="$PROJECT_DIR$/infrastructure/outbox" />
-            <option value="$PROJECT_DIR$/infrastructure/saga" />
             <option value="$PROJECT_DIR$/order-service" />
             <option value="$PROJECT_DIR$/order-service/order-ai" />
             <option value="$PROJECT_DIR$/order-service/order-application" />

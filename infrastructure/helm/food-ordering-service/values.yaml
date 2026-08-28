@@ -13,6 +13,7 @@ imagePullSecrets: []
 service:
   type: ClusterIP
   port: 8181
+  managementPort: 9090
 
 resources:
   requests:
@@ -22,13 +23,13 @@ resources:
     memory: 1Gi
 
 datasource:
-  url: jdbc:postgresql://postgres:5432/postgres?currentSchema=order&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
+  url: jdbc:postgresql://host.minikube.internal:5432/postgres?currentSchema=order&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
   username: postgres
   password: admin
 
 kafka:
-  bootstrapServers: broker-1:19092,broker-2:19092,broker-3:19092
-  schemaRegistryUrl: http://schema-registry:8081
+  bootstrapServers: host.minikube.internal:29094,host.minikube.internal:39094,host.minikube.internal:49094
+  schemaRegistryUrl: http://host.minikube.internal:8081
 
 extraEnv: {}
 

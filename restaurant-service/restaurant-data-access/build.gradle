@@ -8,7 +8,7 @@ dependencies {
     implementation project(':restaurant-service:restaurant-domain:restaurant-application-service')
     implementation project(':common:common-data-access')
     implementation project(':common:common-mapper')
-    implementation project(':infrastructure:outbox')
+    implementation project(':common:outbox')
     implementation project(':common:common-data-access-archive')
 
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'

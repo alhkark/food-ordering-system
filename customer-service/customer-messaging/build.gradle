@@ -6,11 +6,11 @@ plugins {
 
 dependencies {
     implementation project(':customer-service:customer-domain:customer-application-service')
-    implementation project(':infrastructure:kafka:kafka-model')
-    implementation project(':infrastructure:kafka:kafka-producer')
+    implementation project(':common:kafka:kafka-model')
+    implementation project(':common:kafka:kafka-producer')
     implementation project(':customer-service:customer-domain:customer-domain-core')
     implementation project(':common:common-domain')
-    implementation project(':infrastructure:outbox')
+    implementation project(':common:outbox')
 
     implementation libs.mapstruct
     annotationProcessor libs.mapstruct.processor

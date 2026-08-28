@@ -1,0 +1,36 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+  {{- with .Values.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .Values.ingress.className }}
+  ingressClassName: {{ . }}
+  {{- end }}
+  rules:
+    - http:
+        paths:
+          - path: /orders
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ index .Values "order-service" "fullnameOverride" }}
+                port:
+                  number: {{ index .Values "order-service" "service" "port" }}
+          - path: /customers
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ index .Values "customer-service" "fullnameOverride" }}
+                port:
+                  number: {{ index .Values "customer-service" "service" "port" }}
+{{- end }}

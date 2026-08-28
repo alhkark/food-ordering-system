@@ -8,8 +8,8 @@ dependencies {
     api project(':order-service:order-domain:order-domain-core')
     api project(':common:common-domain')
     implementation project(':common:common-mapper')
-    api project(':infrastructure:saga')
-    api project(':infrastructure:outbox')
+    api project(':common:saga')
+    api project(':common:outbox')
 
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework:spring-tx'

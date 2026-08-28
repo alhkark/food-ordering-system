@@ -1,4 +1,10 @@
+ingress:
+  enabled: true
+  className: nginx
+  annotations: {}
+
 order-service:
+  replicaCount: 2
   fullnameOverride: order-service
   image:
     repository: com.food.ordering.system/order.service
@@ -7,16 +13,17 @@ order-service:
   service:
     port: 8181
   datasource:
-    url: jdbc:postgresql://postgres:5432/postgres?currentSchema=order&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
+    url: jdbc:postgresql://host.minikube.internal:5432/postgres?currentSchema=order&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
     username: postgres
     password: admin
   kafka:
-    bootstrapServers: broker-1:19092,broker-2:19092,broker-3:19092
-    schemaRegistryUrl: http://schema-registry:8081
+    bootstrapServers: host.minikube.internal:29094,host.minikube.internal:39094,host.minikube.internal:49094
+    schemaRegistryUrl: http://host.minikube.internal:8081
   extraEnv:
-    SPRING_AI_OLLAMA_BASE_URL: http://ollama:11434
+    SPRING_AI_OLLAMA_BASE_URL: http://host.minikube.internal:11434
 
 payment-service:
+  replicaCount: 2
   fullnameOverride: payment-service
   image:
     repository: com.food.ordering.system/payment.service
@@ -25,14 +32,15 @@ payment-service:
   service:
     port: 8182
   datasource:
-    url: jdbc:postgresql://postgres:5432/postgres?currentSchema=payment&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
+    url: jdbc:postgresql://host.minikube.internal:5432/postgres?currentSchema=payment&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
     username: postgres
     password: admin
   kafka:
-    bootstrapServers: broker-1:19092,broker-2:19092,broker-3:19092
-    schemaRegistryUrl: http://schema-registry:8081
+    bootstrapServers: host.minikube.internal:29094,host.minikube.internal:39094,host.minikube.internal:49094
+    schemaRegistryUrl: http://host.minikube.internal:8081
 
 restaurant-service:
+  replicaCount: 2
   fullnameOverride: restaurant-service
   image:
     repository: com.food.ordering.system/restaurant.service
@@ -41,14 +49,15 @@ restaurant-service:
   service:
     port: 8183
   datasource:
-    url: jdbc:postgresql://postgres:5432/postgres?currentSchema=restaurant&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
+    url: jdbc:postgresql://host.minikube.internal:5432/postgres?currentSchema=restaurant&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
     username: postgres
     password: admin
   kafka:
-    bootstrapServers: broker-1:19092,broker-2:19092,broker-3:19092
-    schemaRegistryUrl: http://schema-registry:8081
+    bootstrapServers: host.minikube.internal:29094,host.minikube.internal:39094,host.minikube.internal:49094
+    schemaRegistryUrl: http://host.minikube.internal:8081
 
 customer-service:
+  replicaCount: 2
   fullnameOverride: customer-service
   image:
     repository: com.food.ordering.system/customer.service
@@ -57,9 +66,9 @@ customer-service:
   service:
     port: 8184
   datasource:
-    url: jdbc:postgresql://postgres:5432/postgres?currentSchema=customer&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
+    url: jdbc:postgresql://host.minikube.internal:5432/postgres?currentSchema=customer&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
     username: postgres
     password: admin
   kafka:
-    bootstrapServers: broker-1:19092,broker-2:19092,broker-3:19092
-    schemaRegistryUrl: http://schema-registry:8081
+    bootstrapServers: host.minikube.internal:29094,host.minikube.internal:39094,host.minikube.internal:49094
+    schemaRegistryUrl: http://host.minikube.internal:8081
