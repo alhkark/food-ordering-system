@@ -155,6 +155,41 @@ services:
     networks:
       - ${GLOBAL_NETWORK:-kafka}
 
+  debezium:
+    build:
+      context: ./debezium
+      args:
+        DEBEZIUM_VERSION: ${DEBEZIUM_VERSION:-3.5.2.Final}
+        CONFLUENT_VERSION: ${CONFLUENT_VERSION:-8.0.3}
+    image: food-ordering-debezium:${DEBEZIUM_VERSION:-3.5.2.Final}
+    container_name: debezium
+    ports:
+      - "8083:8083"
+    depends_on:
+      - broker-1
+      - broker-2
+      - broker-3
+      - schema-registry
+    environment:
+      BOOTSTRAP_SERVERS: broker-1:19092,broker-2:19092,broker-3:19092
+      GROUP_ID: 1
+      CONFIG_STORAGE_TOPIC: debezium_connect_configs
+      OFFSET_STORAGE_TOPIC: debezium_connect_offsets
+      STATUS_STORAGE_TOPIC: debezium_connect_statuses
+      CONFIG_STORAGE_REPLICATION_FACTOR: 3
+      OFFSET_STORAGE_REPLICATION_FACTOR: 3
+      STATUS_STORAGE_REPLICATION_FACTOR: 3
+      KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
+      VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      CONNECT_SCHEMA_NAME_ADJUSTMENT_MODE: avro
+      LOG_LEVEL: DEBUG
+    networks:
+      - ${GLOBAL_NETWORK:-kafka}
+
 volumes:
   controller-1-data:
   controller-2-data:

@@ -2,7 +2,7 @@
 
 Local dependencies and shared libraries for the food-ordering services.
 
-- **docker-compose/** — Postgres, Kafka, Schema Registry, pgAdmin, and Kafdrop. Started with `compose.sh`. See [docker-compose/README.md](docker-compose/README.md).
+- **docker-compose/** — Postgres, Kafka, Schema Registry, Debezium Connect, pgAdmin, and Kafdrop. Started with `compose.sh`. See [docker-compose/README.md](docker-compose/README.md).
 - **helm/** — Kubernetes charts for the four application services. See [helm/food-ordering-system/README.md](helm/README.md).
 
 Ollama is **not** part of Compose. Run it on the host (see below). Order-service uses it at `http://localhost:11434` locally, or `http://host.minikube.internal:11434` from Minikube.

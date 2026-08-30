@@ -1,0 +1,21 @@
+{
+  "name": "order-restaurant-approval-outbox",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "plugin.name": "pgoutput",
+    "database.hostname": "food-ordering-postgres",
+    "database.port": "5432",
+    "database.user": "postgres",
+    "database.password": "admin",
+    "database.dbname": "postgres",
+    "topic.prefix": "debezium_order_restaurant_approval_outbox",
+    "table.include.list": "order.restaurant_approval_outbox",
+    "slot.name": "dbz_order_restaurant_approval_outbox",
+    "publication.name": "dbz_order_restaurant_approval_outbox",
+    "publication.autocreate.mode": "filtered",
+    "tombstones.on.delete": "false",
+    "include.schema.changes": "false",
+    "topic.creation.default.replication.factor": 3,
+    "topic.creation.default.partitions": 3
+  }
+}

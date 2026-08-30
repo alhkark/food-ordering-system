@@ -15,7 +15,7 @@ usage() {
 Usage: $(basename "$0") [command]
 
 Commands:
-  run             Start all compose files and init Kafka topics (default)
+  run             Start all compose files, init Kafka topics, and register Debezium connectors (default)
   up, start       Same as run
   down, stop      Stop all infrastructure services
   down-all        Stop services and remove volumes
@@ -68,8 +68,29 @@ wait_for_kafka() {
   echo "Kafka is ready."
 }
 
+wait_for_postgres() {
+  local max_attempts=90
+  local attempt=1
+
+  echo "Waiting for Postgres..."
+  until docker exec food-ordering-postgres pg_isready -U postgres >/dev/null 2>&1; do
+    if (( attempt >= max_attempts )); then
+      echo "Postgres did not become ready in time." >&2
+      exit 1
+    fi
+    sleep 2
+    ((attempt++))
+  done
+  echo "Postgres is ready."
+}
+
 init_kafka() {
   docker compose "${COMPOSE_FILES[@]}" -f init_kafka.yaml run --rm init-kafka
+}
+
+register_debezium_connectors() {
+  echo "Registering Debezium connectors..."
+  "${SCRIPT_DIR}/debezium/register-connectors.sh"
 }
 
 start_all() {
@@ -78,12 +99,15 @@ start_all() {
   wait_for_kafka
   echo "Initializing Kafka topics..."
   init_kafka
+  wait_for_postgres
+  register_debezium_connectors
   echo
-  echo "Infrastructure is up and Kafka topics are initialized."
+  echo "Infrastructure is up, Kafka topics are initialized, and Debezium connectors are registered."
   echo "  Postgres:        localhost:5432"
   echo "  pgAdmin:         http://localhost:5050"
   echo "  Kafdrop:         http://localhost:9000"
   echo "  Schema Registry: http://localhost:8081"
+  echo "  Debezium Connect: http://localhost:8083"
 }
 
 command="${1:-run}"
