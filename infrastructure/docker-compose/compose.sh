@@ -17,8 +17,8 @@ Usage: $(basename "$0") [command]
 Commands:
   run             Start all compose files, init Kafka topics, and register Debezium connectors (default)
   up, start       Same as run
-  down, stop      Stop all infrastructure services
-  down-all        Stop services and remove volumes
+  down, stop      Delete Debezium connectors, then stop all infrastructure services
+  down-all        Delete Debezium connectors, stop services, and remove volumes
   init            Init Kafka topics only (Kafka must be running)
   reset-pgadmin   Recreate pgAdmin and reload server config
   ps              List running compose services
@@ -93,6 +93,38 @@ register_debezium_connectors() {
   "${SCRIPT_DIR}/debezium/register-connectors.sh"
 }
 
+delete_debezium_connectors() {
+  local connect_url="${CONNECT_URL:-http://localhost:8083}"
+  local connectors_dir="${SCRIPT_DIR}/debezium/connectors"
+  local name http_code
+
+  if ! curl -sf --max-time 5 -H "Expect:" "${connect_url}/connectors" >/dev/null; then
+    echo "Debezium Connect is not reachable; skip deleting connectors."
+    return 0
+  fi
+
+  echo "Deleting Debezium connectors..."
+  shopt -s nullglob
+  local files=("${connectors_dir}"/*.json)
+  if (( ${#files[@]} == 0 )); then
+    echo "No connector JSON files in ${connectors_dir}"
+    return 0
+  fi
+
+  for file in "${files[@]}"; do
+    name="$(python3 -c 'import json, sys; print(json.load(sys.stdin)["name"])' < "${file}")"
+    http_code="$(curl -sS -o /dev/null -w '%{http_code}' --max-time 15 -X DELETE -H "Expect:" \
+      "${connect_url}/connectors/${name}" || true)"
+    if [[ "${http_code}" == "204" || "${http_code}" == "200" ]]; then
+      echo "Deleted connector '${name}'."
+    elif [[ "${http_code}" == "404" ]]; then
+      echo "Connector '${name}' was not registered."
+    else
+      echo "Could not delete '${name}' (HTTP ${http_code})." >&2
+    fi
+  done
+}
+
 start_all() {
   echo "Starting infrastructure..."
   compose up -d "$@"
@@ -118,9 +150,11 @@ case "$command" in
     start_all "$@"
     ;;
   down|stop)
+    delete_debezium_connectors
     compose down "$@"
     ;;
   down-all)
+    delete_debezium_connectors
     compose down -v "$@"
     ;;
   init)

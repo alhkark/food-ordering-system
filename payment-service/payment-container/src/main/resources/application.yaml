@@ -3,7 +3,7 @@ server:
 
 management:
   server:
-    port: ${MANAGEMENT_SERVER_PORT:9090}
+    port: ${MANAGEMENT_SERVER_PORT:9092}
   endpoints:
     web:
       exposure:
@@ -24,10 +24,8 @@ logging:
     org.apache.kafka.clients.producer: ERROR
 
 payment-service:
-  payment-request-topic-name: payment-request
-  payment-response-topic-name: payment-response
-  outbox-scheduler-fixed-rate: 10000
-  outbox-scheduler-initial-delay: 10000
+  payment-request-topic-name: debezium_order_payment_outbox.order.payment_outbox
+  payment-response-topic-name: debezium_payment_order_outbox.payment.order_outbox
 archive:
   jdbc-batch-size: 30
 
@@ -83,7 +81,7 @@ kafka-consumer-config:
   auto-offset-reset: earliest
   specific-avro-reader-key: specific.avro.reader
   specific-avro-reader: true
-  batch-listener: true
+  batch-listener: false
   auto-startup: true
   concurrency-level: 3
   session-timeout-ms: 10000

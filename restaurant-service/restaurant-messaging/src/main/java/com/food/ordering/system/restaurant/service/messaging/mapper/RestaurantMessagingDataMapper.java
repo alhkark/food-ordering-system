@@ -5,9 +5,12 @@ import com.food.ordering.system.domain.valueobject.RestaurantOrderStatus;
 import com.food.ordering.system.kafka.order.avro.model.RestaurantApprovalRequestAvroModel;
 import com.food.ordering.system.kafka.order.avro.model.RestaurantApprovalResponseAvroModel;
 import com.food.ordering.system.mapper.UtilsMapperCommon;
+import com.food.ordering.system.outbox.payload.OrderApprovalEventPayload;
+import com.food.ordering.system.outbox.payload.OrderApprovalEventProduct;
 import com.food.ordering.system.restaurant.service.domain.dto.RestaurantApprovalRequest;
 import com.food.ordering.system.restaurant.service.domain.entity.Product;
 import com.food.ordering.system.restaurant.service.domain.outbox.model.OrderEventPayload;
+import debezium_order_restaurant_approval_outbox.order.restaurant_approval_outbox.Value;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -34,6 +37,21 @@ public interface RestaurantMessagingDataMapper {
   @Mapping(target = "sagaId", source = "sagaId")
   RestaurantApprovalResponseAvroModel toRestaurantApprovalResponseAvroModel(
       OrderEventPayload orderEventPayload, String sagaId);
+
+  @Mapping(target = "createdAt", source = "restaurantApprovalRequestAvroModel.createdAt")
+  RestaurantApprovalRequest toRestaurantApprovalRequest(
+      OrderApprovalEventPayload orderApprovalEventPayload,
+      Value restaurantApprovalRequestAvroModel);
+
+  @Mapping(
+      target = "productId",
+      expression =
+          "java(new com.food.ordering.system.domain.valueobject.ProductId("
+              + "java.util.UUID.fromString(orderApprovalEventProduct.id())))")
+  @Mapping(target = "name", ignore = true)
+  @Mapping(target = "price", ignore = true)
+  @Mapping(target = "available", ignore = true)
+  Product toProduct(OrderApprovalEventProduct orderApprovalEventProduct);
 
   default com.food.ordering.system.kafka.order.avro.model.OrderApprovalStatus
       toAvroOrderApprovalStatus(OrderApprovalStatus orderApproval) {

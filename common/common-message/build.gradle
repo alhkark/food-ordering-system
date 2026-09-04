@@ -1,0 +1,5 @@
+plugins {
+    id 'common-library-convention'
+    id 'logging-library-convention'
+    id 'spring-library-convention'
+}

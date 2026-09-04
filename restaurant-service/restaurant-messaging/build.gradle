@@ -13,6 +13,7 @@ dependencies {
     implementation project(':common:kafka:kafka-producer')
     implementation project(':common:common-mapper')
     implementation project(':common:outbox')
+    implementation project(':common:common-message')
     implementation 'org.springframework.kafka:spring-kafka'
     implementation 'org.postgresql:postgresql'
 

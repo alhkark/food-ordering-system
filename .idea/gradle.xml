@@ -27,6 +27,7 @@
             <option value="$PROJECT_DIR$/common/common-data-access-archive" />
             <option value="$PROJECT_DIR$/common/common-domain" />
             <option value="$PROJECT_DIR$/common/common-mapper" />
+            <option value="$PROJECT_DIR$/common/common-message" />
             <option value="$PROJECT_DIR$/common/kafka" />
             <option value="$PROJECT_DIR$/common/kafka/kafka-config-data" />
             <option value="$PROJECT_DIR$/common/kafka/kafka-consumer" />

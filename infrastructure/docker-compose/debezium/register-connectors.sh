@@ -77,8 +77,68 @@ put_connector() {
   rm -f "${body}"
 }
 
+wait_for_outbox_tables() {
+  local max_attempts="${OUTBOX_TABLE_WAIT_ATTEMPTS:-60}"
+  local attempt=1
+  local postgres_container="${POSTGRES_CONTAINER:-food-ordering-postgres}"
+  local missing_tables=()
+
+  if ! docker ps --format '{{.Names}}' | grep -qx "${postgres_container}"; then
+    echo "Postgres container '${postgres_container}' is not running; skip outbox table wait."
+    return 0
+  fi
+
+  echo "Waiting for outbox tables in Postgres..."
+  while true; do
+    missing_tables=()
+    for table in \
+      "order.payment_outbox" \
+      "order.restaurant_approval_outbox" \
+      "payment.order_outbox" \
+      "restaurant.order_outbox"; do
+      IFS='.' read -r schema table_name <<< "${table}"
+      if ! docker exec "${postgres_container}" psql -U postgres -d postgres -tAc \
+        "SELECT 1 FROM pg_tables WHERE schemaname='${schema}' AND tablename='${table_name}'" \
+        | grep -qx 1; then
+        missing_tables+=("${table}")
+      fi
+    done
+
+    if (( ${#missing_tables[@]} == 0 )); then
+      echo "Outbox tables are ready."
+      return 0
+    fi
+
+    if (( attempt >= max_attempts )); then
+      echo "Warning: outbox tables are still missing after ${max_attempts} attempts:" >&2
+      printf '  - %s\n' "${missing_tables[@]}" >&2
+      echo "Connectors may fail until services run Flyway. Re-run this script after starting services." >&2
+      return 0
+    fi
+
+    sleep 2
+    ((attempt++))
+  done
+}
+
+restart_connectors() {
+  local name
+
+  echo "Restarting connectors so failed tasks recreate replication slots..."
+  for connector_file in "${CONNECTOR_FILES[@]}"; do
+    name="$(connector_name "${connector_file}")"
+    curl -sS -X POST \
+      --max-time 60 \
+      -H "Expect:" \
+      "${CONNECT_URL}/connectors/${name}/restart?includeTasks=true&onlyFailed=false" \
+      >/dev/null
+    echo "Restarted '${name}'."
+  done
+}
+
 wait_for_connect
 wait_for_schema_registry
+wait_for_outbox_tables
 
 for connector_file in "${CONNECTOR_FILES[@]}"; do
   name="$(connector_name "${connector_file}")"
@@ -86,6 +146,8 @@ for connector_file in "${CONNECTOR_FILES[@]}"; do
   put_connector "${name}" "${connector_file}"
   echo "Registered '${name}'."
 done
+
+restart_connectors
 
 echo
 echo "Connectors registered. GET ${CONNECT_URL}/connectors"

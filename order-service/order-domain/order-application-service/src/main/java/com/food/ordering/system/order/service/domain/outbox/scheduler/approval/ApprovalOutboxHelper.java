@@ -4,11 +4,11 @@ import static com.food.ordering.system.saga.order.SagaConstants.ORDER_SAGA_NAME;
 
 import com.food.ordering.system.domain.valueobject.OrderStatus;
 import com.food.ordering.system.order.service.domain.exception.OrderDomainException;
-import com.food.ordering.system.order.service.domain.outbox.model.approval.OrderApprovalEventPayload;
 import com.food.ordering.system.order.service.domain.outbox.model.approval.OrderApprovalOutboxMessage;
 import com.food.ordering.system.order.service.domain.ports.output.repository.ApprovalOutboxRepository;
 import com.food.ordering.system.order.service.domain.ports.output.repository.ArchiveApprovalOutboxRepository;
 import com.food.ordering.system.outbox.OutboxStatus;
+import com.food.ordering.system.outbox.payload.OrderApprovalEventPayload;
 import com.food.ordering.system.saga.SagaStatus;
 import java.util.List;
 import java.util.Optional;

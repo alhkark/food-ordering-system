@@ -22,12 +22,65 @@ Debezium Connect is a **local** image (`food-ordering-debezium`), built from `qu
 ./debezium/register-connectors.sh
 ```
 
+The script waits for the outbox tables, registers connector config, then **restarts** all connectors so failed tasks recreate replication slots. Re-registering config alone does not restart failed tasks.
+
 Check with `GET http://localhost:8083/connectors`. Topics (not the saga request/response topics):
 
 - `debezium_order_payment_outbox.order.payment_outbox`
 - `debezium_order_restaurant_approval_outbox.order.restaurant_approval_outbox`
 - `debezium_payment_order_outbox.payment.order_outbox`
 - `debezium_restaurant_order_outbox.restaurant.order_outbox`
+
+### Debezium startup order
+
+Outbox tables are created by Flyway when you start the Spring services (order, payment, restaurant). Debezium connectors need those tables before they can create filtered publications and replication slots.
+
+Recommended workflow:
+
+1. `./compose.sh run` — start Postgres, Kafka, Schema Registry, and Debezium Connect
+2. Start the application services — Flyway creates the outbox tables
+3. If connectors were registered before the tables existed, run `./debezium/register-connectors.sh` again
+
+Expected replication slots (one per connector):
+
+| Slot | Outbox table |
+|---|---|
+| `dbz_order_payment_outbox` | `order.payment_outbox` |
+| `dbz_order_restaurant_approval_outbox` | `order.restaurant_approval_outbox` |
+| `dbz_payment_order_outbox` | `payment.order_outbox` |
+| `dbz_restaurant_order_outbox` | `restaurant.order_outbox` |
+
+Check slots in Postgres:
+
+```bash
+docker exec food-ordering-postgres psql -U postgres -d postgres -c \
+  "SELECT slot_name, plugin, active FROM pg_replication_slots ORDER BY slot_name;"
+```
+
+When healthy, all four slots exist with `plugin = pgoutput` and `active = t`.
+
+Check connector status:
+
+```bash
+curl -s 'http://localhost:8083/connectors?expand=status' | python3 -m json.tool
+```
+
+Both the connector and its task should be `RUNNING`.
+
+### Debezium troubleshooting
+
+| Symptom | Likely cause | Fix |
+|---|---|---|
+| No replication slots | Connectors failed on first start (tables missing) and were not restarted | Start services, then run `./debezium/register-connectors.sh` |
+| `No table filters found for filtered publication dbz_*` | Outbox tables do not exist yet | Start order/payment/restaurant services, then re-run `./debezium/register-connectors.sh` |
+| Connector `RUNNING`, task `FAILED` | Same as above, or stale failed task | Re-run `./debezium/register-connectors.sh` (it restarts connectors) |
+| `role "<username>" does not exist` | Client connected with your macOS username instead of `postgres` | Use `-U postgres` / password `admin` |
+
+Connect to Postgres as `postgres`, not your OS username:
+
+```bash
+psql -h localhost -p 5432 -U postgres -d postgres
+```
 
 From this directory:
 
@@ -47,8 +100,8 @@ From the repo root:
 |---|---|
 | `run` (default), `up`, `start` | `docker compose up -d`, wait until Kafka is ready, run `init-kafka`, then register Debezium connectors |
 | `init` | Recreate Kafka topics only (brokers must already be up) |
-| `down`, `stop` | Stop containers |
-| `down-all` | Stop containers and **delete volumes** (Postgres data is wiped) |
+| `down`, `stop` | Delete Debezium connectors (if Connect is up), then stop containers |
+| `down-all` | Same, then **delete volumes** (Postgres data is wiped) |
 | `reset-pgadmin` | Recreate pgAdmin so server config reloads |
 | `ps` | List running services |
 | `logs [service]` | Follow logs (`./compose.sh logs broker-1`) |

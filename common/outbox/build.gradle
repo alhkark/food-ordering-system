@@ -1,6 +1,7 @@
 plugins {
     id 'common-library-convention'
     id 'spring-library-convention'
+    id 'logging-library-convention'
 }
 
 dependencies {

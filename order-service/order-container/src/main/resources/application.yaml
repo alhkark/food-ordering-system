@@ -3,7 +3,7 @@ server:
 
 management:
   server:
-    port: ${MANAGEMENT_SERVER_PORT:9090}
+    port: ${MANAGEMENT_SERVER_PORT:9091}
   endpoints:
     web:
       exposure:
@@ -25,13 +25,11 @@ logging:
     org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor: DEBUG
 
 order-service:
-  payment-request-topic-name: payment-request
-  payment-response-topic-name: payment-response
-  restaurant-approval-request-topic-name: restaurant-approval-request
-  restaurant-approval-response-topic-name: restaurant-approval-response
+  payment-request-topic-name: debezium_order_payment_outbox.order.payment_outbox
+  payment-response-topic-name: debezium_payment_order_outbox.payment.order_outbox
+  restaurant-approval-request-topic-name: debezium_order_restaurant_approval_outbox.order.restaurant_approval_outbox
+  restaurant-approval-response-topic-name: debezium_restaurant_order_outbox.restaurant.order_outbox
   customer-topic-name: customer
-  outbox-scheduler-fixed-rate: 10000
-  outbox-scheduler-initial-delay: 10000
 archive:
   jdbc-batch-size: 30
 

@@ -10,9 +10,9 @@ import com.food.ordering.system.order.service.domain.entity.OrderItem;
 import com.food.ordering.system.order.service.domain.event.OrderCancelledEvent;
 import com.food.ordering.system.order.service.domain.event.OrderCreatedEvent;
 import com.food.ordering.system.order.service.domain.event.OrderPaidEvent;
-import com.food.ordering.system.order.service.domain.outbox.model.approval.OrderApprovalEventPayload;
-import com.food.ordering.system.order.service.domain.outbox.model.approval.OrderApprovalEventProduct;
-import com.food.ordering.system.order.service.domain.outbox.model.payment.OrderPaymentEventPayload;
+import com.food.ordering.system.outbox.payload.OrderApprovalEventPayload;
+import com.food.ordering.system.outbox.payload.OrderApprovalEventProduct;
+import com.food.ordering.system.outbox.payload.OrderPaymentEventPayload;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -34,6 +34,8 @@ public interface OrderMapper {
       target = "paymentOrderStatus",
       expression =
           "java(com.food.ordering.system.domain.valueobject.PaymentOrderStatus.PENDING.name())")
+  @Mapping(target = "id", ignore = true)
+  @Mapping(target = "sagaId", ignore = true)
   OrderPaymentEventPayload toOrderPaymentEventPayload(OrderCreatedEvent orderCreatedEvent);
 
   @Mapping(source = "order.id.value", target = "orderId")
