@@ -3,7 +3,9 @@ package com.food.ordering.system.kafka.consumer.config;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.food.ordering.system.kafka.config.data.KafkaConfigData;
 import com.food.ordering.system.kafka.config.data.KafkaConsumerConfigData;
+import com.food.ordering.system.kafka.consumer.KafkaNotRetryableExceptionsProvider;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.apache.avro.specific.SpecificRecordBase;
@@ -71,7 +73,7 @@ public class KafkaConsumerConfig<K extends Serializable, V extends SpecificRecor
 
   @Bean
   public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<K, V>>
-      kafkaListenerContainerFactory() {
+      kafkaListenerContainerFactory(List<KafkaNotRetryableExceptionsProvider> providers) {
     ConcurrentKafkaListenerContainerFactory<K, V> factory =
         new ConcurrentKafkaListenerContainerFactory<>();
     factory.setConsumerFactory(consumerFactory());
@@ -81,13 +83,13 @@ public class KafkaConsumerConfig<K extends Serializable, V extends SpecificRecor
     factory.getContainerProperties().setPollTimeout(kafkaConsumerConfigData.getPollTimeoutMs());
 
     factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.BATCH);
-    factory.setCommonErrorHandler(kafkaErrorHandler());
+    factory.setCommonErrorHandler(kafkaErrorHandler(providers));
 
     return factory;
   }
 
   @Bean
-  public CommonErrorHandler kafkaErrorHandler() {
+  public CommonErrorHandler kafkaErrorHandler(List<KafkaNotRetryableExceptionsProvider> providers) {
     FixedBackOff backOff =
         new FixedBackOff(
             kafkaConsumerConfigData.getRetryIntervalMs(),
@@ -107,6 +109,9 @@ public class KafkaConsumerConfig<K extends Serializable, V extends SpecificRecor
         IllegalArgumentException.class,
         JsonProcessingException.class,
         SerializationException.class);
+
+    providers.forEach(p -> errorHandler.addNotRetryableExceptions(p.getExceptions()));
+
     return errorHandler;
   }
 }

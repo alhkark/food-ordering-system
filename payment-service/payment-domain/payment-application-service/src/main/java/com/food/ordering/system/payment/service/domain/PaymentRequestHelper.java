@@ -38,9 +38,9 @@ public class PaymentRequestHelper {
   private final OrderOutboxHelper orderOutboxHelper;
 
   @Transactional
-  public void persistPayment(PaymentRequest paymentRequest) {
+  public boolean persistPayment(PaymentRequest paymentRequest) {
     if (isOutboxMessageProcessedForPayment(paymentRequest, PaymentStatus.COMPLETED)) {
-      return;
+      return true;
     }
     log.info("Received payment complete event for order id: {}", paymentRequest.getOrderId());
     Payment payment = paymentDataMapper.toPayment(paymentRequest);
@@ -50,19 +50,14 @@ public class PaymentRequestHelper {
     PaymentEvent paymentEvent =
         paymentDomainService.validateAndInitiatePayment(
             payment, creditEntry, creditHistories, failureMessages);
-    persistDbObjects(payment, creditEntry, creditHistories, failureMessages);
-
-    orderOutboxHelper.saveOrderOutboxMessage(
-        paymentDataMapper.toOrderEventPayload(paymentEvent),
-        paymentEvent.payment().getPaymentStatus(),
-        OutboxStatus.STARTED,
-        UUID.fromString(paymentRequest.getSagaId()));
+    return persistIfSucceeded(
+        paymentRequest, failureMessages, creditEntry, payment, creditHistories, paymentEvent);
   }
 
   @Transactional
-  public void persistCancelPayment(PaymentRequest paymentRequest) {
+  public boolean persistCancelPayment(PaymentRequest paymentRequest) {
     if (isOutboxMessageProcessedForPayment(paymentRequest, PaymentStatus.CANCELLED)) {
-      return;
+      return true;
     }
     log.info("Received payment rollback event for order id: {}", paymentRequest.getOrderId());
     Optional<Payment> paymentResponse =
@@ -79,13 +74,8 @@ public class PaymentRequestHelper {
     PaymentEvent paymentEvent =
         paymentDomainService.validateAndCancelPayment(
             payment, creditEntry, creditHistories, failureMessages);
-    persistDbObjects(payment, creditEntry, creditHistories, failureMessages);
-
-    orderOutboxHelper.saveOrderOutboxMessage(
-        paymentDataMapper.toOrderEventPayload(paymentEvent),
-        paymentEvent.payment().getPaymentStatus(),
-        OutboxStatus.STARTED,
-        UUID.fromString(paymentRequest.getSagaId()));
+    return persistIfSucceeded(
+        paymentRequest, failureMessages, creditEntry, payment, creditHistories, paymentEvent);
   }
 
   private CreditEntry getCreditEntry(CustomerId customerId) {
@@ -133,5 +123,33 @@ public class PaymentRequestHelper {
       return true;
     }
     return false;
+  }
+
+  private boolean persistIfSucceeded(
+      PaymentRequest paymentRequest,
+      List<String> failureMessages,
+      CreditEntry creditEntry,
+      Payment payment,
+      List<CreditHistory> creditHistories,
+      PaymentEvent paymentEvent) {
+    boolean isSucceeded = true;
+    if (!failureMessages.isEmpty()) {
+      int version = creditEntry.getVersion();
+      creditEntryRepository.detach(payment.getCustomerId());
+      creditEntry = getCreditEntry(payment.getCustomerId());
+      isSucceeded = creditEntry.getVersion() == version;
+    }
+
+    if (isSucceeded) {
+      persistDbObjects(payment, creditEntry, creditHistories, failureMessages);
+
+      orderOutboxHelper.saveOrderOutboxMessage(
+          paymentDataMapper.toOrderEventPayload(paymentEvent),
+          paymentEvent.payment().getPaymentStatus(),
+          OutboxStatus.STARTED,
+          UUID.fromString(paymentRequest.getSagaId()));
+    }
+
+    return isSucceeded;
   }
 }
